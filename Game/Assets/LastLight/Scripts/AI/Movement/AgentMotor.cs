@@ -10,10 +10,10 @@ namespace LastLight.AI.Movement
     /// </summary>
     public enum MovementStatus
     {
-        Stopped, // no route to follow
-        Moving,  // following a route
-        Arrived, // reached the final point
-        Blocked  // made almost no progress for too long
+        Stopped,
+        Moving,  
+        Arrived,
+        Blocked  
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ namespace LastLight.AI.Movement
         [Tooltip("Abrupt movement (instant speed and rotation) for before/after comparison videos.")]
         [SerializeField] private bool snapMode = false;
 
-        // -Public information other scripts can read- 
+        //Public information other scripts can read
 
         /// <summary>Current movement status.</summary>
         public MovementStatus Status { get; private set; } = MovementStatus.Stopped;
@@ -67,6 +67,9 @@ namespace LastLight.AI.Movement
         /// robot does not look like it is running.
         /// </summary>
         public float MeasuredSpeed { get; private set; }
+
+        /// <summary>Fraction of max speed to use (e.g. 0.5 for patrol, 1 for chase).</summary>
+        public float SpeedMultiplier { get; set; } = 1f;
 
         /// <summary>When true, the motor freezes (used by game pause).</summary>
         public bool IsPaused { get; set; }
@@ -81,7 +84,7 @@ namespace LastLight.AI.Movement
         /// <summary>Raised whenever the status changes (e.g. Moving -> Arrived).</summary>
         public event Action<MovementStatus> StatusChanged;
 
-        // ---------- Internal state ----------
+        // Internal state
 
         private CharacterController controller;
         private readonly List<Vector3> path = new List<Vector3>();
@@ -98,7 +101,7 @@ namespace LastLight.AI.Movement
             controller = GetComponent<CharacterController>();
         }
 
-        // - Commands (called by AI code) -
+        // Commands (called by AI code) 
 
         /// <summary>
         /// Give the motor a new route. Any previous route is replaced.
@@ -153,7 +156,7 @@ namespace LastLight.AI.Movement
             IsPaused = false;
         }
 
-        // - Per-frame update -
+        // Per-frame update
 
         private void Update()
         {
@@ -227,16 +230,17 @@ namespace LastLight.AI.Movement
 
             Vector3 direction = toTarget / distance; // unit vector towards the point
             bool isFinalPoint = currentIndex == path.Count - 1;
+            float topSpeed = maxSpeed * Mathf.Max(0f, SpeedMultiplier);
 
             // Abrupt mode: for the "before" comparison video 
             if (snapMode)
             {
                 transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
-                currentSpeed = maxSpeed;
-                return direction * (maxSpeed * dt);
+                currentSpeed = topSpeed;
+                return direction * (topSpeed * dt);
             }
 
-            //- Smooth mode -
+            // Smooth mode
 
             // Turn gradually towards the direction of travel.
             TurnTowards(direction, dt);
@@ -245,13 +249,13 @@ namespace LastLight.AI.Movement
             // At turnInPlaceAngle or more, desired speed is 0: we turn on the spot.
             float angle = Vector3.Angle(transform.forward, direction);
             float facingFactor = Mathf.Clamp01(1f - angle / turnInPlaceAngle);
-            float desiredSpeed = maxSpeed * facingFactor;
+            float desiredSpeed = topSpeed * facingFactor;
 
             // Slow down when approaching the final point, so we stop smoothly.
             if (isFinalPoint)
             {
                 float arrivalFactor = Mathf.Clamp01(distance / slowDownDistance);
-                desiredSpeed = Mathf.Min(desiredSpeed, maxSpeed * arrivalFactor);
+                desiredSpeed = Mathf.Min(desiredSpeed, topSpeed * arrivalFactor);
             }
 
             // Change speed gradually (acceleration / deceleration).
@@ -301,7 +305,7 @@ namespace LastLight.AI.Movement
             StatusChanged?.Invoke(newStatus);
         }
 
-        //- Debug drawing (Scene view) -
+        // Debug drawing (Scene view) 
 
         private void OnDrawGizmos()
         {
