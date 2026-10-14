@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LastLight.AI.Director;
 using LastLight.AI.Movement;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace LastLight.AI.Hunter
     /// into a path request and motor commands. Contains no decision logic itself.
     /// </summary>
     [RequireComponent(typeof(AgentMotor), typeof(HunterSensor))]
-    public class HunterAgent : MonoBehaviour
+    public class HunterAgent : MonoBehaviour, ISpawnableAgent
     {
         [SerializeField] private HunterSettings settings = new HunterSettings();
         [SerializeField] private Transform[] patrolPoints;
@@ -39,6 +40,9 @@ namespace LastLight.AI.Hunter
 
         private int appliedGoalVersion = -1;
         private float decisionTimer;
+
+        // Active Hunters, so each debug overlay can be stacked below the previous one.
+        private static readonly List<HunterAgent> overlayOrder = new List<HunterAgent>();
         private float lastAttackTime = -999f;
         private Vector3 startPosition;
         private Quaternion startRotation;
@@ -75,12 +79,14 @@ namespace LastLight.AI.Hunter
         {
             sensor.NoiseHeard += OnNoiseHeard;
             motor.StatusChanged += OnMotorStatusChanged;
+            overlayOrder.Add(this);
         }
 
         private void OnDisable()
         {
             sensor.NoiseHeard -= OnNoiseHeard;
             motor.StatusChanged -= OnMotorStatusChanged;
+            overlayOrder.Remove(this);
         }
 
         private void OnNoiseHeard(Vector3 position, float perceivedStrength, float timeHeard)
@@ -144,7 +150,7 @@ namespace LastLight.AI.Hunter
             }
         }
 
-                                              // Pause and reset 
+        //Pause and reset
 
         public void SetPaused(bool paused)
         {
@@ -153,8 +159,15 @@ namespace LastLight.AI.Hunter
         }
 
         /// <summary>Returns the Hunter to its starting state for a level restart.</summary>
-        public void ResetAgent()
+        public void ResetAgent() => ResetAgentAt(startPosition, startRotation);
+
+        /// <summary>Clears all state and places the Hunter (used by the Director at a service bay).</summary>
+        public void ResetAgentAt(Vector3 position, Quaternion rotation)
         {
+            startPosition = position;
+            startRotation = rotation;
+            if (Brain == null) return; // not initialised yet; Awake will use this position
+
             Memory.Clear();
             Brain.Reset();
             motor.ResetMotor();
@@ -169,7 +182,7 @@ namespace LastLight.AI.Hunter
             SetPaused(false);
         }
 
-                                                    // Debug
+        // Debug
 
         private void OnDrawGizmos()
         {
@@ -219,7 +232,21 @@ namespace LastLight.AI.Hunter
                     : $"{marker}noise S {s.Strength01:0.00}  R {s.Recency01:0.00}  C {s.Cost01:0.00}  = {s.Score:0.00}");
             }
 
-            GUI.Label(new Rect(10, 10, 520, 220), text.ToString(), new GUIStyle(GUI.skin.label) { richText = true });
+            // Dark box behind the text so it is readable on any background.
+            // Stack each Hunter's box below the boxes of Hunters listed before it.
+            float top = 10f;
+            foreach (HunterAgent other in overlayOrder)
+            {
+                if (other == this) break;
+                if (other.showOverlay && other.Brain != null)
+                    top += 50f + 18f * other.Brain.LastScores.Count;
+            }
+            var area = new Rect(10, top, 520, 40 + 18 * Brain.LastScores.Count);
+            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, GUIContent.none);
+            var style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 14 };
+            style.normal.textColor = Color.white;
+            GUI.Label(new Rect(area.x + 8, area.y + 4, area.width - 16, area.height), text.ToString(), style);
         }
     }
 }
