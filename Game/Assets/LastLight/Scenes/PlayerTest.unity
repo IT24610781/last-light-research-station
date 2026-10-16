@@ -267,6 +267,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &342367996
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 342367997}
+  m_Layer: 0
+  m_Name: Support_3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &342367997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 342367996}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.5, y: 1, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 539185002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &374858932
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,6 +410,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &412314362 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3172135803950142775, guid: 0570a5dcf85f9444e9200992cb73ad24, type: 3}
+  m_PrefabInstance: {fileID: 7391318019213990744}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &465699300
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,7 +446,7 @@ Transform:
   m_GameObject: {fileID: 465699300}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 1, z: -2}
+  m_LocalPosition: {x: -3, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -520,6 +556,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97268105d352b4943a137c11951ff8be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RepairableAlly
+  repairPoint: {fileID: 0}
   testDanger: 0
 --- !u!114 &465699307
 MonoBehaviour:
@@ -644,6 +681,71 @@ Transform:
   m_LocalScale: {x: 12, y: 3, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &496061625
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 496061626}
+  m_Layer: 0
+  m_Name: Support_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &496061626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496061625}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 4.5, y: 1, z: -4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 539185002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &539185001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 539185002}
+  m_Layer: 0
+  m_Name: RepairSupportPositions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &539185002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 539185001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1131854094}
+  - {fileID: 496061626}
+  - {fileID: 342367997}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &748441849
@@ -791,6 +893,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1131854093
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1131854094}
+  m_Layer: 0
+  m_Name: Support_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1131854094
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131854093}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.5, y: 1, z: -4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 539185002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1152548966
 GameObject:
@@ -1146,9 +1279,14 @@ GameObject:
   - component: {fileID: 1847231882}
   - component: {fileID: 1847231885}
   - component: {fileID: 1847231884}
-  - component: {fileID: 1847231883}
   - component: {fileID: 1847231887}
   - component: {fileID: 1847231886}
+  - component: {fileID: 1847231889}
+  - component: {fileID: 1847231888}
+  - component: {fileID: 1847231890}
+  - component: {fileID: 1847231891}
+  - component: {fileID: 1847231893}
+  - component: {fileID: 1847231892}
   m_Layer: 0
   m_Name: RepairRobot
   m_TagString: Untagged
@@ -1165,35 +1303,12 @@ Transform:
   m_GameObject: {fileID: 1847231881}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2, y: 1, z: -2}
+  m_LocalPosition: {x: -3, y: 1, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 748441850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &1847231883
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1847231881}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1847231884
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1270,6 +1385,10 @@ MonoBehaviour:
   missingHealthWeight: 100
   distancePenaltyPerMetre: 2
   dangerPenalty: 30
+  switchScoreMargin: 15
+  unreachableRetrySeconds: 3
+  useTestDanger: 0
+  logDecisions: 1
 --- !u!114 &1847231887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1283,6 +1402,136 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maximumHealth: 100
+--- !u!114 &1847231888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847231881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2de3b00dd3d016c4ab9cbc1d42fc7ba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LastLight.AI.Movement.AgentMotor
+  maxSpeed: 3.5
+  acceleration: 6
+  deceleration: 10
+  turnSpeed: 270
+  turnInPlaceAngle: 60
+  waypointTolerance: 0.25
+  slowDownDistance: 1.5
+  blockedTimeout: 1
+  minProgressRatio: 0.25
+  gravity: -20
+  snapMode: 0
+--- !u!143 &1847231889
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847231881}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1847231890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847231881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972d27c8a4538d84d864df560e294ccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepairRobotMovement
+  repathInterval: 0.5
+  targetMoveThreshold: 0.5
+  supportPositions:
+  - {fileID: 1131854094}
+  - {fileID: 496061626}
+  - {fileID: 342367997}
+  supportArrivalDistance: 0.4
+  blockedRetrySeconds: 3
+  separationWeight: 4
+  supportDangerPenalty: 50
+  supportRoutePenalty: 1
+--- !u!114 &1847231891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847231881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84bf0ff6abd68194b9b367204b9dcf49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepairRobotRepair
+  repairRange: 2
+  healthPerSecond: 20
+  repairInterval: 0.25
+  repairBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1847231892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847231881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec9410bb4fbdb33478d4c777bb8e238e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepairRobotSensor
+  player: {fileID: 412314362}
+  eye: {fileID: 0}
+  viewDistance: 12
+  fieldOfView: 120
+  immediateDangerDistance: 3
+  hearingRange: 12
+  minimumHeardStrength: 2
+  memorySeconds: 4
+  sightLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1847231893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847231881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4a7005f29e1e0e42b33a27125601610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepairRoutePlanner
+  pathProvider: {fileID: 0}
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  approachDistance: 1.5
+  repairRange: 2
 --- !u!1 &2052911443
 GameObject:
   m_ObjectHideFlags: 0
@@ -1586,7 +1835,7 @@ Transform:
   m_GameObject: {fileID: 2143383895}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -2}
+  m_LocalPosition: {x: 0, y: 1, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1696,6 +1945,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97268105d352b4943a137c11951ff8be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RepairableAlly
+  repairPoint: {fileID: 0}
   testDanger: 0
 --- !u!114 &2143383902
 MonoBehaviour:
@@ -1850,3 +2100,4 @@ SceneRoots:
   - {fileID: 3388208476143587324}
   - {fileID: 1152548972}
   - {fileID: 748441850}
+  - {fileID: 539185002}
