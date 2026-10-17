@@ -82,6 +82,7 @@ namespace LastLight.AI.Guard
         private CoverPoint reservedCover;
         private CoverPoint bestCover;
         private Transform bestRetreat;
+        private GuardObservation lastObservation;
 
         private bool hasGoal;
         private Vector3 goal;
@@ -142,6 +143,7 @@ namespace LastLight.AI.Guard
 
             sensor.UpdateSensing(gameplayTime);
             GuardObservation observation = BuildObservation();
+            lastObservation = observation;
             LastDecision = brain.Decide(observation, gameplayTime);
             currentAction = LastDecision.Action;
             Apply(currentAction);
@@ -490,8 +492,12 @@ namespace LastLight.AI.Guard
             }
             text.AppendLine("HP " + health.CurrentHealth.ToString("0") + "/" + health.MaximumHealth.ToString("0")
                 + "   Ammo " + ammo + "/" + magazineSize + (reloading ? " (reloading)" : ""));
+            text.AppendLine("Exposure " + lastObservation.Exposure01.ToString("0.00")
+                + "   Sees player: " + lastObservation.HasVisibleTarget);
+            text.AppendLine("Motor: " + motor.Status + "   Speed " + motor.MeasuredSpeed.ToString("0.0")
+                + "   Cover: " + (reservedCover != null ? reservedCover.name : "none"));
 
-            Rect area = new Rect(Screen.width - 440f, 10f, 430f, 190f);
+            Rect area = new Rect(Screen.width - 440f, 10f, 430f, 250f);
             GUI.Box(area, GUIContent.none);
             GUI.Box(area, GUIContent.none);
             GUIStyle style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 14 };
