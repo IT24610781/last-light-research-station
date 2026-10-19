@@ -151,6 +151,7 @@ public class RepairRobotScenarioTests : MonoBehaviour
         Check(movement.State == RepairRobotMovement.RepairState.Waiting,
             "No injured allies: waits at reachable support after danger expires");
 
+        Check(robot.GetComponent<RepairRobotPresentation>() != null, "Production prefab supplies animation presentation");
         int failed = Results.FindAll(item => item.StartsWith("FAIL")).Count;
         Status = $"Complete: {Results.Count - failed} passed, {failed} failed";
         Debug.Log("[Repair verification] " + Status + "\n" + string.Join("\n", Results));
@@ -164,14 +165,16 @@ public class RepairRobotScenarioTests : MonoBehaviour
         Cube("Floor", new Vector3(0f, -0.5f, 0f), new Vector3(16f, 1f, 16f));
         a = Capsule("Ally A", new Vector3(0f, 1f, -3f)).AddComponent<RepairableAlly>();
         b = Capsule("Ally B", new Vector3(-3f, 1f, 0f)).AddComponent<RepairableAlly>();
-        robot = Capsule("Repair verification robot", new Vector3(-3f, 1f, -3f));
+        robot = UnityEngine.Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LastLight/Prefabs/AI/RepairRobot.prefab"), Origin + new Vector3(-3f, 1f, -3f), Quaternion.identity);
+        robot.name = "Repair verification robot";
+        robot.transform.SetParent(fixture.transform); robot.transform.position = Origin + new Vector3(-3f, 1f, -3f);
         robot.SetActive(false);
-        DestroyImmediate(robot.GetComponent<CapsuleCollider>());
-        var cc = robot.AddComponent<CharacterController>(); cc.height = 2f; cc.radius = 0.5f; cc.center = Vector3.zero;
-        robot.AddComponent<AgentMotor>();
-        selector = robot.AddComponent<RepairTargetSelector>();
-        movement = robot.AddComponent<RepairRobotMovement>();
-        repair = robot.AddComponent<RepairRobotRepair>();
+        // Production prefab supplies the movement collider and AI components.
+        var cc = robot.GetComponent<CharacterController>(); // Verify production collider dimensions.
+        // Keep the production motor.
+        selector = robot.GetComponent<RepairTargetSelector>();
+        movement = robot.GetComponent<RepairRobotMovement>();
+        repair = robot.GetComponent<RepairRobotRepair>();
         planner = robot.GetComponent<RepairRoutePlanner>(); sensor = robot.GetComponent<RepairRobotSensor>();
         Set(selector, "allies", new[] { a, b });
         Set(selector, "logDecisions", false);

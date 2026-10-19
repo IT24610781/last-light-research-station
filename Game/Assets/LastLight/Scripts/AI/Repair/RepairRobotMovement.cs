@@ -106,7 +106,7 @@ public class RepairRobotMovement : MonoBehaviour
             blockedSupports[supportIndex] = Time.time + blockedRetrySeconds;
             Stop(); supporting = true; nextRouteTime = 0f;
         }
-        if (hasRoute && Vector3.Distance(transform.position, Destination) <= supportArrivalDistance)
+        if (hasRoute && ReachedSupport(Destination))
         {
             motor.Stop(); hasRoute = false;
             State = retreat ? RepairState.Retreating : RepairState.Waiting;
@@ -152,12 +152,21 @@ public class RepairRobotMovement : MonoBehaviour
         MovementReason = retreat ? "Retreating using observed danger and reachable support scores" :
             "Returning to reachable support position";
         MovementReason += $"; chosen score {bestScore:F1}";
-        if (Vector3.Distance(transform.position, Destination) <= supportArrivalDistance)
+        if (ReachedSupport(Destination))
         {
             motor.Stop(); hasRoute = false;
             State = retreat ? RepairState.Retreating : RepairState.Waiting; return;
         }
         if (different) { motor.SetPath(bestPath); hasRoute = true; }
+    }
+    private bool ReachedSupport(Vector3 point)
+    {
+        Vector3 delta = point - transform.position;
+        // Ground settling can change root height; the motor measures arrival on the floor plane.
+        // Keep a height guard so a support directly above on another floor is not considered reached.
+        if (Mathf.Abs(delta.y) > 0.5f) return false;
+        delta.y = 0f;
+        return delta.magnitude <= supportArrivalDistance;
     }
     private void Stop()
     {
