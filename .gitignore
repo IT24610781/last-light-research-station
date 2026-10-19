@@ -118,3 +118,8 @@ InitTestScene*.unity*
 /Recordings/
 
 /Game/.vscode/
+
+# Unity auto-generated ProjectSettings folders
+Game/ProjectSettings/Packages/
+
+
