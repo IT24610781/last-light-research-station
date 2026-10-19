@@ -26,6 +26,8 @@ namespace LastLight.AI.Guard
         [SerializeField] private float fieldOfView = 150f;
         [Tooltip("Seconds the last seen position is remembered after losing sight.")]
         [SerializeField] private float threatMemorySeconds = 5f;
+        [Tooltip("Within this distance (m) the Guard notices the player even outside its view cone, as if it heard footsteps. Walls still block it.")]
+        [SerializeField] private float closeAwarenessRadius = 3f;
 
         private Collider body;
         private bool hasThreat;
@@ -104,8 +106,11 @@ namespace LastLight.AI.Guard
 
             if (toTarget.magnitude > viewDistance) return false;
 
+            // Outside the view cone the Guard only notices the player at very close range.
+            // The line-of-sight check below still applies, so walls hide the player.
+            bool inCloseRange = toTarget.magnitude <= closeAwarenessRadius;
             Vector3 flatToTarget = new Vector3(toTarget.x, 0f, toTarget.z);
-            if (Vector3.Angle(transform.forward, flatToTarget) > fieldOfView * 0.5f) return false;
+            if (!inCloseRange && Vector3.Angle(transform.forward, flatToTarget) > fieldOfView * 0.5f) return false;
 
             // Line of sight: the first thing the ray hits must be the player.
             RaycastHit hit;
