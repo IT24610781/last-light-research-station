@@ -1,0 +1,33 @@
+{
+  "status": "Complete: 27 passed, 0 failed",
+  "results": [
+    "PASS Healthy allies: no repair target",
+    "PASS Select injured ally",
+    "PASS Stability retains target for small improvement",
+    "PASS Larger utility improvement switches target",
+    "PASS Full-health target is replaced",
+    "PASS Dead target excluded; no resurrection",
+    "PASS Robot cannot select itself",
+    "PASS Uses supplied route cost, not straight-line distance",
+    "PASS Blocked target cooldown selects another ally",
+    "PASS Disabled ally excluded",
+    "PASS Checked direct fallback rejects obstructed repair routes",
+    "PASS Unreachable target retried after obstacle removal/cooldown",
+    "PASS Repair increases health gradually, not instantly",
+    "PASS Wall stops repair immediately",
+    "PASS Repair resumes and clamps at maximum health",
+    "PASS No repair beyond range",
+    "PASS Dead ally never repaired",
+    "PASS AgentMotor approaches an injured ally",
+    "PASS Approach transitions to repair",
+    "PASS Pause freezes repair",
+    "PASS Dead repair robot cannot continue healing",
+    "PASS Vision detects an exposed player in the view cone",
+    "PASS Hidden player movement does not update remembered location",
+    "PASS Threat memory expires",
+    "PASS Noise records an audible source observation",
+    "PASS Immediate danger interrupts repairs and retreats to reachable support",
+    "PASS No injured allies: waits at reachable support after danger expires"
+  ],
+  "playerTestSmoke": "Ally_A restored from 50 to 100; robot returned to support; no new gameplay errors"
+}
