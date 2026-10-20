@@ -50,6 +50,8 @@ GameObject:
   - component: {fileID: 7261799442715231224}
   - component: {fileID: 3948176683293305212}
   - component: {fileID: 8334677635915133872}
+  - component: {fileID: 2602039420466308142}
+  - component: {fileID: 5750429930185595773}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -234,6 +236,31 @@ MonoBehaviour:
   hittableLayers:
     serializedVersion: 2
     m_Bits: 51
+--- !u!114 &2602039420466308142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2815594597165394418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae5017297331a2543b8258c73dd245e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maximumHealth: 100
+--- !u!114 &5750429930185595773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2815594597165394418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fffe7a8ac840574ea3d383df6c70ab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathHandler
 --- !u!1 &3558042050807038802
 GameObject:
   m_ObjectHideFlags: 0
