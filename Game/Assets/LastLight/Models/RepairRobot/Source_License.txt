@@ -1,0 +1,56 @@
+===========================================
+  Animation 3D Character - Spid-B Bot 2.0
+===========================================
+ 
+  -Author: 3Darknight
+  -Release Date: 2026-01-23
+  -Software: Blender 3.0
+  
+-----------------
+   DESCRIPTION
+-----------------
+
+  "Spid-B Bot" is a fully rigged spider robot with facial movements, designed for animation in Blender.
+  This package also includes a .obj,.glb, and .fbx versions with a basic rig for easy import.
+  You’re free to use or modify this asset in any way you like — credit is not required but always
+  appreciated.  
+  
+  Thank you very much for your support!
+  
+------------
+   UPDATE   
+------------
+
+Spid-B Bot 2.0 now has:
+  - Improved geometry and UV maps.
+  - New 4K texture.
+  - Improved rig with new facial movement bones.
+  - New functional color switch system working in both Cycles and Eevee.
+  - A custom color editor.
+  - Improved IK/FK switching.
+  
+Model Info:
+  -Vertices:   37.286
+  -Edges:      73.927
+  -Triangles:  73.304
+  
+-------------
+   LICENSE   
+-------------
+
+  This asset is provided under a **Royalty Free License**.
+
+  YOU MAY:
+  - Use the asset in personal and commercial projects.
+  - Modify the model, textures, or animations as needed.
+  - Include the asset in games, films, or renders without paying royalties.
+  
+  YOU MAY NOT:
+  - Redistribute or resell the asset “as-is” or in a competing asset pack.
+  - Claim the original asset as your own creation.
+
+  Attribution is appreciated but not required.
+  
+=============================================
+   © 2026 3Darknight - All Rights Reserved
+=============================================
