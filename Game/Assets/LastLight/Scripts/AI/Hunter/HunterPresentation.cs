@@ -32,7 +32,17 @@ namespace LastLight.AI.Hunter
             motor = GetComponent<AgentMotor>();
             hunter = GetComponent<HunterAgent>();
             health = GetComponent<Health>();
-            if (animator == null) animator = GetComponentInChildren<Animator>();
+            if (animator == null || animator.runtimeAnimatorController == null)
+            {
+                Animator[] candidates = GetComponentsInChildren<Animator>(true);
+                animator = null;
+                for (int i = 0; i < candidates.Length; i++)
+                {
+                    if (candidates[i].runtimeAnimatorController == null) continue;
+                    animator = candidates[i];
+                    break;
+                }
+            }
             if (animator != null) animator.applyRootMotion = false;
         }
 
@@ -42,7 +52,7 @@ namespace LastLight.AI.Hunter
             if (health != null) health.Died += OnDied;
 
             // A pooled robot re-activated by the Director starts from a clean pose.
-            if (animator != null)
+            if (animator != null && animator.runtimeAnimatorController != null && animator.gameObject.activeInHierarchy)
             {
                 animator.Rebind();
                 animator.Update(0f);
@@ -57,7 +67,7 @@ namespace LastLight.AI.Hunter
 
         private void Update()
         {
-            if (animator == null) return;
+            if (animator == null || !animator.gameObject.activeInHierarchy || animator.runtimeAnimatorController == null) return;
 
             bool paused = motor.IsPaused || Time.timeScale == 0f;
             animator.speed = paused ? 0f : 1f;
