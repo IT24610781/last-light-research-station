@@ -14,6 +14,8 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
 
     public bool IsOpen => open;
     public float OpenFraction => fraction;
+    public AudioSource doorAudio;
+    public AudioClip doorOpenSound;
 
     public void Configure(Transform left, Transform right)
     {
@@ -30,7 +32,15 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
         if (rightLeaf != null) rightClosed = rightLeaf.localPosition;
     }
 
-    public void Interact() => open = !open;
+    public void Interact() 
+       {
+        open = !open;
+        
+        if (doorAudio != null && doorOpenSound != null) 
+        {
+            doorAudio.PlayOneShot(doorOpenSound);
+        }
+    }
 
     private void Update()
     {
