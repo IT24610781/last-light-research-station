@@ -1,6 +1,6 @@
 # IT24104259(Member B): Agent Controller, Sound Hunter and Encounter Director
 
-Owner: Member B (Agent Controller). Scene: `AgentTest`.
+Owner: IT24104259 (Agent Controller). Scene: `AgentTest`.
 Code: `Scripts/AI/Movement`, `Scripts/AI/Hunter`, `Scripts/AI/Director`, `Tests/Editor`.
 Model: `Models/Barricade.fbx` (source `art-source/barricade.blend`).
 
@@ -158,3 +158,4 @@ Before A* existed, a straight-line fallback let the Hunter be built and tested. 
 Play-mode checks done in `AgentTest`: smooth vs snap movement, noise investigation and search, lost-sight search behind a wall, blocked-route recovery at the barricade, A* route around the barricade, Director cooldown / waiting / activation / pool exhaustion / reset.
 
 ---
+

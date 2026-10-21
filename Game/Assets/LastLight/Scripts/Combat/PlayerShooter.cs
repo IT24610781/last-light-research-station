@@ -29,6 +29,8 @@ public class PlayerShooter : MonoBehaviour
     private PlayerGrabber grabber;
 
     private WeaponSlot equipped;
+    private bool ownsRifle;
+    private bool ownsPistol;
     private float reloadTimeRemaining;
     private bool readyToFire;
 
@@ -36,6 +38,8 @@ public class PlayerShooter : MonoBehaviour
     public bool IsReloading { get; private set; }
     public GunDefinition CurrentDefinition =>
         equipped != null ? equipped.definition : null;
+    public bool HasRifle => ownsRifle;
+    public bool HasPistol => ownsPistol;
 
     private string WeaponName => equipped == rifle ? "Rifle" : "Pistol";
 
@@ -69,7 +73,9 @@ public class PlayerShooter : MonoBehaviour
         rifle.ammo = rifle.definition.magazineCapacity;
         pistol.ammo = pistol.definition.magazineCapacity;
 
-        Equip(rifle);
+        equipped = null;
+        rifle.view.SetActive(false);
+        pistol.view.SetActive(false);
     }
 
     private bool IsConfigured(WeaponSlot slot)
@@ -95,14 +101,14 @@ public class PlayerShooter : MonoBehaviour
         // Switching happens before advancing the reload timer.
         if (controlsActive && !grabber.IsHolding)
         {
-            if (selectRifleAction.WasPressedThisFrame() &&
+            if (ownsRifle && selectRifleAction.WasPressedThisFrame() &&
                 equipped != rifle)
             {
                 Equip(rifle);
                 return;
             }
 
-            if (selectPistolAction.WasPressedThisFrame() &&
+            if (ownsPistol && selectPistolAction.WasPressedThisFrame() &&
                 equipped != pistol)
             {
                 Equip(pistol);
@@ -110,7 +116,7 @@ public class PlayerShooter : MonoBehaviour
             }
         }
 
-        if (grabber.IsHolding)
+        if (grabber.IsHolding || equipped == null)
         {
             CancelReload();
             readyToFire = false;
@@ -202,6 +208,24 @@ public class PlayerShooter : MonoBehaviour
 
         Debug.Log($"Selected {WeaponName}.", this);
         ReportAmmo();
+    }
+
+    public bool AcquireRifle()
+    {
+        if (ownsRifle) return false;
+        ownsRifle = true;
+        rifle.ammo = rifle.definition.magazineCapacity;
+        Equip(rifle);
+        return true;
+    }
+
+    public bool AcquirePistol()
+    {
+        if (ownsPistol) return false;
+        ownsPistol = true;
+        pistol.ammo = pistol.definition.magazineCapacity;
+        Equip(pistol);
+        return true;
     }
 
     private void BeginReload()
