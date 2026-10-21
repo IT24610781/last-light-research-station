@@ -58,12 +58,17 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
         }
 
         open = !open;
+        StationAudioDirector.Instance?.PlayDoor(transform.position);
     }
 
     private void Update()
     {
         if (leftLeaf == null || rightLeaf == null) return;
-        if (!open && NearbyAgentCanOpen()) open = true;
+        if (!open && NearbyAgentCanOpen())
+        {
+            open = true;
+            StationAudioDirector.Instance?.PlayDoor(transform.position);
+        }
 
         // Reopen rather than closing onto a character or a carried physics object.
         if (!open && fraction > 0f)

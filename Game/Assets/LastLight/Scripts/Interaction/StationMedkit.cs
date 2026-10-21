@@ -13,6 +13,7 @@ public sealed class StationMedkit : MonoBehaviour, IInteractable
             health.IsDead || health.CurrentHealth >= health.MaximumHealth) return;
         if (Vector3.Distance(player.transform.position, transform.position) > 3.5f) return;
         health.Heal(healing);
+        StationAudioDirector.Instance?.PlayPickup(transform.position);
         gameObject.SetActive(false);
     }
 }

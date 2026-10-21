@@ -32,6 +32,8 @@ public sealed class GameSessionController : MonoBehaviour
     private Text healthText;
     private Text ammoText;
     private Text objectiveText;
+    private Text roomText;
+    private GameObject roomPanel;
     private Text promptText;
     private Text overlayTitle;
     private Text overlayMessage;
@@ -45,12 +47,15 @@ public sealed class GameSessionController : MonoBehaviour
 
     private float mouseSensitivity;
     private float volume;
+    private string currentRoom;
+    private float roomTitleUntil;
 
     private void Awake()
     {
         Time.timeScale = 0f;
         FindSceneReferences();
         BuildInterface();
+        gameObject.AddComponent<StationAudioDirector>();
         LoadSettings();
         BindPlayer();
         SetState(SessionState.Start);
@@ -138,6 +143,8 @@ public sealed class GameSessionController : MonoBehaviour
     private void SetState(SessionState next)
     {
         State = next;
+        if (next == SessionState.Won || next == SessionState.Lost)
+            StationAudioDirector.Instance?.PlayOutcome();
         bool playing = next == SessionState.Playing;
         bool showOverlay = !playing;
 
@@ -180,8 +187,8 @@ public sealed class GameSessionController : MonoBehaviour
             case SessionState.Start:
                 ConfigureOverlay(
                     "LAST LIGHT",
-                    "Research Station\n\nActivate Relay A in POWER, then Relay B in MAIN LAB.\nReach EVACUATION and use its terminal to escape.\n\nWASD move  •  SHIFT sprint  •  C crouch/hide  •  E interact\nEnemies hear sprinting, thrown objects and gunfire.",
-                    "START",
+                    "The station went dark after an experiment breached containment.\nSecurity machines now hunt anything that moves.\n\nRestore power in the POWER ROOM, activate the MAIN LAB relay,\nthen reach the EVACUATION terminal before the station locks down.\n\nWASD MOVE   •   SHIFT SPRINT   •   C CROUCH   •   E USE\nSprinting, thrown objects and gunfire draw attention.",
+                    "ENTER STATION",
                     true);
                 break;
             case SessionState.Paused:
@@ -193,8 +200,8 @@ public sealed class GameSessionController : MonoBehaviour
                 break;
             case SessionState.Won:
                 ConfigureOverlay(
-                    "STATION SECURED",
-                    "All required objectives are complete.",
+                    "EVACUATION COMPLETE",
+                    "Both relays are online. The escape route is open.\n\nYou make it beyond the research station as the emergency doors seal behind you.\nThe machines remain inside, but their signal is still active.\n\nMISSION COMPLETE",
                     "PLAY AGAIN",
                     false);
                 break;
@@ -306,7 +313,7 @@ public sealed class GameSessionController : MonoBehaviour
         }
         else
         {
-            ammoText.text = string.Empty;
+            ammoText.text = "NO WEAPON  •  SEARCH THE ARMORY";
         }
 
         StationProgressionManager progression =
@@ -317,9 +324,8 @@ public sealed class GameSessionController : MonoBehaviour
                 Time.unscaledTime < progression.StatusMessageUntil)
             {
                 objectiveText.text = progression.StatusMessage;
-                return;
             }
-            if (!progression.RelayAOnline)
+            else if (!progression.RelayAOnline)
             {
                 objectiveText.text = "OBJECTIVE  ACTIVATE RELAY A — POWER";
             }
@@ -333,14 +339,41 @@ public sealed class GameSessionController : MonoBehaviour
             }
         }
 
+        UpdateRoomTitle();
         promptText.text = GetInteractionPrompt();
+    }
+
+    private void UpdateRoomTitle()
+    {
+        if (roomPanel == null || player == null) return;
+        Vector3 position = player.transform.position;
+        string room = string.Empty;
+        if (Mathf.Abs(position.x) > 3.2f)
+        {
+            bool west = position.x < 0f;
+            bool upper = position.y > 3f;
+            int row = position.z < -4f ? 0 : position.z > 4f ? 2 : 1;
+            if (upper)
+                room = west ? new[] { "03  MEDICAL", "08  SECURITY", "07  ROBOT WORKSHOP" }[row]
+                            : new[] { "09  CREW QUARTERS", "06  MAIN LAB", "06  MAIN LAB" }[row];
+            else
+                room = west ? new[] { "02  ARMORY", "04  POWER ROOM", "05  STORAGE" }[row]
+                            : new[] { "01  ARRIVAL", "01  ARRIVAL", "10  EVACUATION" }[row];
+        }
+        if (room != currentRoom)
+        {
+            currentRoom = room;
+            roomTitleUntil = Time.unscaledTime + 4f;
+            roomText.text = room;
+        }
+        roomPanel.SetActive(!string.IsNullOrEmpty(room) && Time.unscaledTime < roomTitleUntil);
     }
 
     private string GetInteractionPrompt()
     {
         if (grabber != null && grabber.IsHolding)
         {
-            return "E  DROP     Q  THROW";
+            return "[E]  DROP OBJECT       [Q]  THROW";
         }
 
         if (playerCamera == null)
@@ -363,13 +396,32 @@ public sealed class GameSessionController : MonoBehaviour
 
         if (hit.collider.GetComponentInParent<CarryableObject>() != null)
         {
-            return "E  PICK UP";
+            return "[E]  PICK UP OBJECT";
         }
 
-        if (hit.collider.GetComponentInParent<IInteractable>() != null)
+        StationRelay relay = hit.collider.GetComponentInParent<StationRelay>();
+        if (relay != null)
+            return relay.Activated ? "RELAY " + relay.Id + " ONLINE" : "[E]  ACTIVATE RELAY " + relay.Id;
+
+        StationSlidingDoor door = hit.collider.GetComponentInParent<StationSlidingDoor>();
+        if (door != null)
         {
-            return "E  INTERACT";
+            StationProgressionManager progression = StationProgressionManager.Instance;
+            if (progression != null && !progression.CanOpen(door.Requirement))
+                return door.Requirement == StationSlidingDoor.AccessRequirement.RelayA
+                    ? "LOCKED  •  RELAY A REQUIRED" : "LOCKED  •  BOTH RELAYS REQUIRED";
+            return door.IsOpen ? "[E]  CLOSE DOOR" : "[E]  OPEN DOOR";
         }
+
+        if (hit.collider.GetComponentInParent<StationEvacuationTerminal>() != null)
+            return "[E]  INITIATE EVACUATION";
+        StationWeaponPickup weapon = hit.collider.GetComponentInParent<StationWeaponPickup>();
+        if (weapon != null)
+            return "[E]  TAKE " + weapon.Type.ToString().ToUpperInvariant();
+        if (hit.collider.GetComponentInParent<StationMedkit>() != null)
+            return "[E]  USE MEDKIT";
+        if (hit.collider.GetComponentInParent<IInteractable>() != null)
+            return "[E]  USE";
 
         return string.Empty;
     }
@@ -455,13 +507,13 @@ public sealed class GameSessionController : MonoBehaviour
         RectTransform ammoPanel = CreatePanel(
             "Ammo Panel", hudRoot.transform,
             new Vector2(1f, 0f), new Vector2(1f, 0f),
-            new Vector2(-442f, 28f), new Vector2(410f, 92f),
+            new Vector2(-28f, 28f), new Vector2(450f, 92f),
             new Color(0.02f, 0.05f, 0.07f, 0.86f));
 
         ammoText = CreateText(
             "Ammo Text", ammoPanel, "WEAPON",
             28f, TextAnchor.MiddleCenter,
-            new Vector2(12f, 12f), new Vector2(386f, 68f));
+            new Vector2(12f, 12f), new Vector2(426f, 68f));
 
         objectiveText = CreateText(
             "Objective Text", hudRoot.transform,
@@ -470,6 +522,18 @@ public sealed class GameSessionController : MonoBehaviour
             new Vector2(32f, -74f), new Vector2(720f, 46f),
             new Vector2(0f, 1f), new Vector2(0f, 1f));
         objectiveText.color = new Color(0.95f, 0.72f, 0.2f, 1f);
+
+        roomPanel = CreatePanel(
+            "Room Banner", hudRoot.transform,
+            new Vector2(0f, 1f), new Vector2(0f, 1f),
+            new Vector2(32f, -150f), new Vector2(520f, 58f),
+            new Color(0.02f, 0.07f, 0.10f, 0.82f)).gameObject;
+        roomText = CreateText(
+            "Room Name", roomPanel.transform, string.Empty,
+            28f, TextAnchor.MiddleLeft,
+            new Vector2(18f, 4f), new Vector2(490f, 50f));
+        roomText.color = new Color(0.25f, 0.96f, 0.87f, 1f);
+        roomPanel.SetActive(false);
 
         promptText = CreateText(
             "Interaction Prompt", hudRoot.transform, string.Empty,
@@ -483,6 +547,8 @@ public sealed class GameSessionController : MonoBehaviour
             new Vector2(-20f, -20f), new Vector2(40f, 40f),
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
         crosshair.color = new Color(0.85f, 1f, 0.98f, 0.9f);
+
+        hudRoot.AddComponent<RobotHealthHud>().Initialize(playerCamera);
     }
 
     private void BuildOverlay(Transform parent)
@@ -496,29 +562,29 @@ public sealed class GameSessionController : MonoBehaviour
         overlayTitle = CreateText(
             "Title", overlayRoot.transform, "LAST LIGHT",
             72f, TextAnchor.MiddleCenter,
-            new Vector2(-500f, 250f), new Vector2(1000f, 100f),
+            new Vector2(0f, 300f), new Vector2(1000f, 100f),
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
         overlayTitle.color = new Color(0.3f, 0.95f, 0.88f, 1f);
 
         overlayMessage = CreateText(
             "Message", overlayRoot.transform, string.Empty,
-            28f, TextAnchor.MiddleCenter,
-            new Vector2(-500f, 120f), new Vector2(1000f, 110f),
+            20f, TextAnchor.MiddleCenter,
+            new Vector2(0f, 135f), new Vector2(1000f, 150f),
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 
         primaryButton = CreateButton(
             "Primary Button", overlayRoot.transform, "START",
-            new Vector2(-170f, 15f), new Vector2(340f, 66f));
+            new Vector2(0f, -25f), new Vector2(340f, 66f));
         primaryButtonText = primaryButton.GetComponentInChildren<Text>();
 
         restartButton = CreateButton(
             "Restart Button", overlayRoot.transform, "RESTART",
-            new Vector2(-170f, -65f), new Vector2(340f, 58f));
+            new Vector2(0f, -105f), new Vector2(340f, 58f));
         restartButton.onClick.AddListener(RestartGame);
 
         quitButton = CreateButton(
             "Quit Button", overlayRoot.transform, "QUIT",
-            new Vector2(-170f, -137f), new Vector2(340f, 58f));
+            new Vector2(0f, -177f), new Vector2(340f, 58f));
         quitButton.onClick.AddListener(QuitGame);
 
         Text sensitivityLabel = CreateText(

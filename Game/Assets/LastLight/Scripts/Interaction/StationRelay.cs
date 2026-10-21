@@ -6,9 +6,13 @@ public sealed class StationRelay : MonoBehaviour, IInteractable
 
     [SerializeField] private RelayId relay;
     [SerializeField] private Renderer indicator;
+    [SerializeField] private Renderer[] linkedIndicators = new Renderer[0];
     [SerializeField] private Color offlineColor = new Color(0.65f, 0.08f, 0.03f);
-    [SerializeField] private Color onlineColor = new Color(0.05f, 0.85f, 1f);
+    [SerializeField] private Color onlineColor = new Color(0.05f, 0.9f, 0.35f);
     private bool activated;
+
+    public RelayId Id => relay;
+    public bool Activated => activated;
 
     public void Configure(RelayId id, Renderer statusIndicator = null)
     {
@@ -26,20 +30,28 @@ public sealed class StationRelay : MonoBehaviour, IInteractable
         if (progression == null || !progression.ActivateRelay(relay)) return;
         activated = true;
         RefreshIndicator();
+        StationAudioDirector.Instance?.PlayRelay(transform.position);
     }
 
     private void RefreshIndicator()
     {
         if (indicator == null) indicator = GetComponentInChildren<Renderer>();
-        if (indicator == null || !Application.isPlaying) return;
+        if (!Application.isPlaying) return;
+        SetColor(indicator);
+        foreach (Renderer linked in linkedIndicators) SetColor(linked);
+    }
 
-        Material runtimeMaterial = indicator.material;
-        runtimeMaterial.color = activated ? onlineColor : offlineColor;
+    private void SetColor(Renderer target)
+    {
+        if (target == null) return;
+        Material runtimeMaterial = target.material;
+        Color color = activated ? onlineColor : offlineColor;
+        if (runtimeMaterial.HasProperty("_BaseColor")) runtimeMaterial.SetColor("_BaseColor", color);
+        else if (runtimeMaterial.HasProperty("_Color")) runtimeMaterial.color = color;
         if (runtimeMaterial.HasProperty("_EmissionColor"))
         {
             runtimeMaterial.EnableKeyword("_EMISSION");
-            runtimeMaterial.SetColor(
-                "_EmissionColor", activated ? onlineColor * 2f : offlineColor);
+            runtimeMaterial.SetColor("_EmissionColor", color * (activated ? 2f : 0.6f));
         }
     }
 }
