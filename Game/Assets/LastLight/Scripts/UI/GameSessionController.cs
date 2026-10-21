@@ -180,7 +180,7 @@ public sealed class GameSessionController : MonoBehaviour
             case SessionState.Start:
                 ConfigureOverlay(
                     "LAST LIGHT",
-                    "Research Station\n\nSurvive, investigate and restore the station.",
+                    "Research Station\n\nActivate Relay A in POWER, then Relay B in MAIN LAB.\nReach EVACUATION and use its terminal to escape.\n\nWASD move  •  SHIFT sprint  •  C crouch/hide  •  E interact\nEnemies hear sprinting, thrown objects and gunfire.",
                     "START",
                     true);
                 break;
@@ -313,6 +313,12 @@ public sealed class GameSessionController : MonoBehaviour
             StationProgressionManager.Instance;
         if (objectiveText != null && progression != null)
         {
+            if (!string.IsNullOrEmpty(progression.StatusMessage) &&
+                Time.unscaledTime < progression.StatusMessageUntil)
+            {
+                objectiveText.text = progression.StatusMessage;
+                return;
+            }
             if (!progression.RelayAOnline)
             {
                 objectiveText.text = "OBJECTIVE  ACTIVATE RELAY A — POWER";

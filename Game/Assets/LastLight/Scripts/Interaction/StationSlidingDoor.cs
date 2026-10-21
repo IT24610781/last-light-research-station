@@ -31,7 +31,16 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
         accessRequirement = requirement;
     }
 
-    private void Awake() => CacheClosedPositions();
+    private void Awake()
+    {
+        CacheClosedPositions();
+        if (accessRequirement == AccessRequirement.None)
+        {
+            open = true;
+            fraction = 1f;
+            ApplyLeafPositions();
+        }
+    }
 
     private void CacheClosedPositions()
     {
@@ -54,13 +63,15 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
     private void Update()
     {
         if (leftLeaf == null || rightLeaf == null) return;
+        if (!open && NearbyAgentCanOpen()) open = true;
+
         // Reopen rather than closing onto a character or a carried physics object.
         if (!open && fraction > 0f)
         {
-            var occupants = Physics.OverlapBox(transform.position + Vector3.up * 1.25f,
+            Collider[] occupants = Physics.OverlapBox(transform.position + Vector3.up * 1.25f,
                 new Vector3(0.65f, 1.2f, 1.05f), transform.rotation,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
-            foreach (var occupant in occupants)
+            foreach (Collider occupant in occupants)
             {
                 if (occupant.transform.IsChildOf(transform)) continue;
                 if (occupant is CharacterController || occupant.attachedRigidbody != null)
@@ -70,9 +81,31 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
                 }
             }
         }
+
         fraction = Mathf.MoveTowards(fraction, open ? 1f : 0f,
             speed / travel * Time.deltaTime);
-        leftLeaf.localPosition = leftClosed + Vector3.back * (travel * fraction);
-        rightLeaf.localPosition = rightClosed + Vector3.forward * (travel * fraction);
+        ApplyLeafPositions();
+    }
+    private bool NearbyAgentCanOpen()
+    {
+        StationProgressionManager progression = StationProgressionManager.Instance;
+        if (progression != null && !progression.CanOpen(accessRequirement)) return false;
+
+        Collider[] nearby = Physics.OverlapBox(transform.position + Vector3.up * 1.1f,
+            new Vector3(3f, 1.1f, 1.2f), transform.rotation,
+            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        foreach (Collider item in nearby)
+        {
+            if (item.transform.IsChildOf(transform)) continue;
+            if (item.GetComponentInParent<LastLight.AI.Movement.AgentMotor>() != null)
+                return true;
+        }
+        return false;
+    }
+
+    private void ApplyLeafPositions()
+    {
+        if (leftLeaf != null) leftLeaf.localPosition = leftClosed + Vector3.back * (travel * fraction);
+        if (rightLeaf != null) rightLeaf.localPosition = rightClosed + Vector3.forward * (travel * fraction);
     }
 }

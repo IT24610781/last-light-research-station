@@ -301,9 +301,7 @@ namespace LastLight.AI.Guard
                     Vector3 lastKnown;
                     if (sensor.TryGetThreat(out lastKnown))
                     {
-                        if (motor.Status == MovementStatus.Moving) motor.Stop();
-                        hasGoal = false;
-                        motor.FaceTowards(lastKnown);
+                        if (MoveToward(lastKnown, null)) motor.FaceTowards(lastKnown);
                     }
                     else
                     {

@@ -45,7 +45,7 @@ namespace LastLight.AI.Movement
 
         [Header("Blocked detection")]
         [Tooltip("Seconds of little progress before the robot reports Blocked.")]
-        [SerializeField] private float blockedTimeout = 1f;
+        [SerializeField] private float blockedTimeout = 3f;
         [Tooltip("Actual speed below this fraction of the intended speed counts as 'little progress'.")]
         [SerializeField, Range(0f, 1f)] private float minProgressRatio = 0.25f;
 

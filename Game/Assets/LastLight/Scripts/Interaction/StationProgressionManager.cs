@@ -7,7 +7,17 @@ public sealed class StationProgressionManager : MonoBehaviour
 
     public bool RelayAOnline { get; private set; }
     public bool RelayBOnline { get; private set; }
+
+    public string StatusMessage { get; private set; }
+    public float StatusMessageUntil { get; private set; }
     public event Action ProgressChanged;
+
+    private void SetStatus(string message, float duration = 4f)
+    {
+        StatusMessage = message;
+        StatusMessageUntil = Time.unscaledTime + duration;
+        Debug.Log(message, this);
+    }
 
     private void Awake()
     {
@@ -38,7 +48,9 @@ public sealed class StationProgressionManager : MonoBehaviour
             RelayBOnline = true;
         }
 
-        Debug.Log($"Relay {relay} is online.", this);
+        SetStatus(relay == StationRelay.RelayId.A
+            ? "RELAY A ONLINE — MAIN LAB ACCESS UNLOCKED"
+            : "RELAY B ONLINE — EVACUATION ACCESS UNLOCKED", 5f);
         ProgressChanged?.Invoke();
         return true;
     }
@@ -61,7 +73,7 @@ public sealed class StationProgressionManager : MonoBehaviour
         string reason = requirement == StationSlidingDoor.AccessRequirement.RelayA
             ? "Relay A must be activated first."
             : "Both station relays must be activated first.";
-        Debug.Log(reason, this);
+        SetStatus(reason.ToUpperInvariant(), 4f);
     }
 
     public bool TryEvacuate()
@@ -74,6 +86,7 @@ public sealed class StationProgressionManager : MonoBehaviour
 
         GameSessionController session = FindFirstObjectByType<GameSessionController>();
         if (session == null) return false;
+        SetStatus("EVACUATION COMPLETE", 6f);
         session.CompleteGame();
         return true;
     }
