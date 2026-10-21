@@ -31,6 +31,7 @@ public sealed class GameSessionController : MonoBehaviour
     private GameObject overlayRoot;
     private Text healthText;
     private Text ammoText;
+    private Text objectiveText;
     private Text promptText;
     private Text overlayTitle;
     private Text overlayMessage;
@@ -308,6 +309,24 @@ public sealed class GameSessionController : MonoBehaviour
             ammoText.text = string.Empty;
         }
 
+        StationProgressionManager progression =
+            StationProgressionManager.Instance;
+        if (objectiveText != null && progression != null)
+        {
+            if (!progression.RelayAOnline)
+            {
+                objectiveText.text = "OBJECTIVE  ACTIVATE RELAY A — POWER";
+            }
+            else if (!progression.RelayBOnline)
+            {
+                objectiveText.text = "OBJECTIVE  ACTIVATE RELAY B — MAIN LAB";
+            }
+            else
+            {
+                objectiveText.text = "OBJECTIVE  REACH EVACUATION";
+            }
+        }
+
         promptText.text = GetInteractionPrompt();
     }
 
@@ -437,6 +456,14 @@ public sealed class GameSessionController : MonoBehaviour
             "Ammo Text", ammoPanel, "WEAPON",
             28f, TextAnchor.MiddleCenter,
             new Vector2(12f, 12f), new Vector2(386f, 68f));
+
+        objectiveText = CreateText(
+            "Objective Text", hudRoot.transform,
+            "OBJECTIVE  ACTIVATE RELAY A — POWER",
+            24f, TextAnchor.MiddleLeft,
+            new Vector2(32f, -74f), new Vector2(720f, 46f),
+            new Vector2(0f, 1f), new Vector2(0f, 1f));
+        objectiveText.color = new Color(0.95f, 0.72f, 0.2f, 1f);
 
         promptText = CreateText(
             "Interaction Prompt", hudRoot.transform, string.Empty,
