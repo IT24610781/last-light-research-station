@@ -3,13 +3,10 @@ using UnityEngine;
 /// <summary>A two-leaf room door operated by the player's existing Interact action.</summary>
 public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
 {
-    public enum AccessRequirement { None, RelayA, BothRelays }
-
     [SerializeField] private Transform leftLeaf;
     [SerializeField] private Transform rightLeaf;
     [SerializeField, Min(0.1f)] private float travel = 1.2f;
     [SerializeField, Min(0.1f)] private float speed = 2.5f;
-    [SerializeField] private AccessRequirement accessRequirement;
     private Vector3 leftClosed;
     private Vector3 rightClosed;
     private bool open;
@@ -17,18 +14,16 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
 
     public bool IsOpen => open;
     public float OpenFraction => fraction;
-    public AccessRequirement Requirement => accessRequirement;
+    public AudioSource doorAudio;
+    public AudioClip doorOpenSound;
+    public enum AccessRequirement { None, RelayA, RelayB, BothRelays }
+    public AccessRequirement requiredAccess = AccessRequirement.None;
 
     public void Configure(Transform left, Transform right)
     {
         leftLeaf = left;
         rightLeaf = right;
         CacheClosedPositions();
-    }
-
-    public void ConfigureAccess(AccessRequirement requirement)
-    {
-        accessRequirement = requirement;
     }
 
     private void Awake() => CacheClosedPositions();
@@ -39,16 +34,14 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
         if (rightLeaf != null) rightClosed = rightLeaf.localPosition;
     }
 
-    public void Interact()
-    {
-        StationProgressionManager progression = StationProgressionManager.Instance;
-        if (progression != null && !progression.CanOpen(accessRequirement))
-        {
-            progression.ReportLocked(accessRequirement);
-            return;
-        }
-
+    public void Interact() 
+       {
         open = !open;
+        
+        if (doorAudio != null && doorOpenSound != null) 
+        {
+            doorAudio.PlayOneShot(doorOpenSound);
+        }
     }
 
     private void Update()
