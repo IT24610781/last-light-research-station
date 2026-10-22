@@ -41,6 +41,9 @@ namespace LastLight.AI.Guard
         [SerializeField] private float arriveRadius = 0.6f;
         [Tooltip("How long a blocked or unreachable destination is ignored.")]
         [SerializeField] private float blockedRetrySeconds = 3f;
+        [Tooltip("Optional patrol stops used while no threat is known.")]
+        [SerializeField] private Transform[] patrolPoints;
+        [SerializeField] private float patrolWait = 1.25f;
 
         [Header("Weapon")]
         [SerializeField] private int magazineSize = 12;
@@ -82,6 +85,8 @@ namespace LastLight.AI.Guard
         private CoverPoint reservedCover;
         private CoverPoint bestCover;
         private Transform bestRetreat;
+        private int patrolIndex;
+        private float patrolResumeAt;
         private GuardObservation lastObservation;
 
         private bool hasGoal;
@@ -293,12 +298,48 @@ namespace LastLight.AI.Guard
                     break;
 
                 default: // Hold
-                    if (motor.Status == MovementStatus.Moving) motor.Stop();
-                    hasGoal = false;
                     Vector3 lastKnown;
-                    if (sensor.TryGetThreat(out lastKnown)) motor.FaceTowards(lastKnown);
-                    else motor.ClearFaceTarget();
+                    if (sensor.TryGetThreat(out lastKnown))
+                    {
+                        if (motor.Status == MovementStatus.Moving) motor.Stop();
+                        hasGoal = false;
+                        motor.FaceTowards(lastKnown);
+                    }
+                    else
+                    {
+                        PatrolWhileIdle();
+                    }
                     break;
+            }
+        }
+
+        private void PatrolWhileIdle()
+        {
+            motor.ClearFaceTarget();
+            if (patrolPoints == null || patrolPoints.Length == 0)
+            {
+                if (motor.Status == MovementStatus.Moving) motor.Stop();
+                hasGoal = false;
+                return;
+            }
+
+            if (gameplayTime < patrolResumeAt)
+            {
+                if (motor.Status == MovementStatus.Moving) motor.Stop();
+                return;
+            }
+
+            Transform stop = patrolPoints[patrolIndex % patrolPoints.Length];
+            if (stop == null)
+            {
+                patrolIndex = (patrolIndex + 1) % patrolPoints.Length;
+                return;
+            }
+
+            if (MoveToward(stop.position, stop))
+            {
+                patrolIndex = (patrolIndex + 1) % patrolPoints.Length;
+                patrolResumeAt = gameplayTime + patrolWait;
             }
         }
 
@@ -503,6 +544,5 @@ namespace LastLight.AI.Guard
             GUIStyle style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 14 };
             style.normal.textColor = Color.white;
             GUI.Label(new Rect(area.x + 8f, area.y + 4f, area.width - 16f, area.height), text.ToString(), style);
-        }
-    }
+        }}
 }
