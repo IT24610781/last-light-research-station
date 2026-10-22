@@ -16,6 +16,8 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
     public float OpenFraction => fraction;
     public AudioSource doorAudio;
     public AudioClip doorOpenSound;
+    public enum AccessRequirement { None, RelayA, RelayB, BothRelays }
+    public AccessRequirement requiredAccess = AccessRequirement.None;
 
     public void Configure(Transform left, Transform right)
     {

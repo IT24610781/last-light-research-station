@@ -3,7 +3,22 @@ guid: 858f30abbf2c1ba4ca7054d4c5eec438
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LL_Relay_Body
+    second: {fileID: 2100000, guid: 75ca18a1156da2b4db507f6ce0fae315, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LL_Relay_Button
+    second: {fileID: 2100000, guid: 731a62c68aa3dab41ab5fb8030ea50d5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LL_Relay_Light
+    second: {fileID: 2100000, guid: 4f683554298729e48ac1acf96d1abab8, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -47,7 +62,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 0
+    generateSecondaryUV: 1
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
