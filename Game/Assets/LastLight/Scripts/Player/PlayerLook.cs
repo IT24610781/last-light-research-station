@@ -26,12 +26,26 @@ public class PlayerLook : MonoBehaviour
             return;
         }
 
-        SetCursorCaptured(true);
+        GameSessionController session =
+            FindFirstObjectByType<GameSessionController>();
+
+        SetCursorCaptured(
+            session == null ||
+            session.State == GameSessionController.SessionState.Playing);
+    }
+
+    public void SetSensitivity(float value)
+    {
+        mouseSensitivity = Mathf.Clamp(value, 0.02f, 0.5f);
     }
 
     private void Update()
     {
-        if (Keyboard.current != null &&
+        bool sessionOwnsPause =
+            FindFirstObjectByType<GameSessionController>() != null;
+
+        if (!sessionOwnsPause &&
+            Keyboard.current != null &&
             Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             SetCursorCaptured(false);
@@ -40,7 +54,8 @@ public class PlayerLook : MonoBehaviour
 
         if (Cursor.lockState != CursorLockMode.Locked)
         {
-            if (Mouse.current != null &&
+            if (!sessionOwnsPause &&
+                Mouse.current != null &&
                 Mouse.current.leftButton.wasPressedThisFrame)
             {
                 SetCursorCaptured(true);
@@ -54,10 +69,8 @@ public class PlayerLook : MonoBehaviour
         float horizontalRotation = mouseDelta.x * mouseSensitivity;
         float verticalRotation = mouseDelta.y * mouseSensitivity;
 
-        // Turn the whole player left and right.
         transform.Rotate(0f, horizontalRotation, 0f);
 
-        // Tilt only the camera up and down.
         cameraPitch -= verticalRotation;
         cameraPitch = Mathf.Clamp(
             cameraPitch, -maximumLookAngle, maximumLookAngle);
