@@ -1,0 +1,7 @@
+PASS Director counts all five initial robots
+PASS Both floors connected by a complete route: 23.7m
+PASS Physical motor climbs stair route: (0.03, 4.08, -8.25) / Arrived
+PASS Director activates a pooled Hunter from a safe bay: Activate Hunter at bay 0 (score 0.76 > wait 0.15)
+PASS Spawned reserve is a real Hunter with model and AI
+PASS Director does not spawn while paused
+COMPLETE

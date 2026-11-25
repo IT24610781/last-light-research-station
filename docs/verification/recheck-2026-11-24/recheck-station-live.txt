@@ -1,0 +1,12 @@
+PASS Station starts unarmed
+PASS Guard detects and damages the real player: 100 -> 52
+PASS Hunter detects and damages the real player: 100 -> 70
+PASS Escape blocked before relays
+PASS Relay A indicator initially red
+PASS Relay A hold activates green indicator
+PASS A unlocks yellow access but keeps evacuation locked
+PASS Relay B indicator initially red
+PASS Relay B hold activates green indicator
+PASS Director mission sensor sees both relays
+PASS Both relays and living player reach victory
+COMPLETE

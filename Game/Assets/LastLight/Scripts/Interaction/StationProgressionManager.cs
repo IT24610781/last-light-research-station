@@ -1,13 +1,25 @@
 using System;
 using UnityEngine;
 
-public sealed class StationProgressionManager : MonoBehaviour
+public sealed class StationProgressionManager : MonoBehaviour, LastLight.AI.Director.IMissionProgress
 {
     public static StationProgressionManager Instance { get; private set; }
 
     public bool RelayAOnline { get; private set; }
     public bool RelayBOnline { get; private set; }
+    public int RelaysOnline => (RelayAOnline ? 1 : 0) + (RelayBOnline ? 1 : 0);
+    public int RelaysTotal => 2;
+
+    public string StatusMessage { get; private set; }
+    public float StatusMessageUntil { get; private set; }
     public event Action ProgressChanged;
+
+    private void SetStatus(string message, float duration = 4f)
+    {
+        StatusMessage = message;
+        StatusMessageUntil = Time.unscaledTime + duration;
+        Debug.Log(message, this);
+    }
 
     private void Awake()
     {
@@ -38,7 +50,9 @@ public sealed class StationProgressionManager : MonoBehaviour
             RelayBOnline = true;
         }
 
-        Debug.Log($"Relay {relay} is online.", this);
+        SetStatus(RelayAOnline && RelayBOnline
+            ? "BOTH RELAYS ONLINE — REACH EVACUATION"
+            : $"RELAY {relay} ONLINE — ACTIVATE THE REMAINING RELAY", 5f);
         ProgressChanged?.Invoke();
         return true;
     }
@@ -49,10 +63,14 @@ public sealed class StationProgressionManager : MonoBehaviour
         {
             case StationSlidingDoor.AccessRequirement.RelayA:
                 return RelayAOnline;
+            case StationSlidingDoor.AccessRequirement.RelayB:
+                return RelayBOnline;
             case StationSlidingDoor.AccessRequirement.BothRelays:
                 return RelayAOnline && RelayBOnline;
-            default:
+            case StationSlidingDoor.AccessRequirement.None:
                 return true;
+            default:
+                return false;
         }
     }
 
@@ -60,8 +78,10 @@ public sealed class StationProgressionManager : MonoBehaviour
     {
         string reason = requirement == StationSlidingDoor.AccessRequirement.RelayA
             ? "Relay A must be activated first."
-            : "Both station relays must be activated first.";
-        Debug.Log(reason, this);
+            : requirement == StationSlidingDoor.AccessRequirement.RelayB
+                ? "Relay B must be activated first."
+                : "Both station relays must be activated first.";
+        SetStatus(reason.ToUpperInvariant(), 4f);
     }
 
     public bool TryEvacuate()
@@ -73,7 +93,8 @@ public sealed class StationProgressionManager : MonoBehaviour
         }
 
         GameSessionController session = FindFirstObjectByType<GameSessionController>();
-        if (session == null) return false;
+        if (session == null || !session.CanEvacuate) return false;
+        SetStatus("EVACUATION COMPLETE", 6f);
         session.CompleteGame();
         return true;
     }

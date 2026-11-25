@@ -54,7 +54,8 @@ public class RepairRobotDebugWindow : EditorWindow
         text.AppendLine($"Decision: {selector.Decision}");
         if (sensor != null)
             text.AppendLine($"Observed: {sensor.Observation}\nImmediate danger: {sensor.ImmediateDanger}");
-        if (repair != null) text.AppendLine($"Repair active: {repair.IsRepairing}");
+        if (repair != null) text.AppendLine($"Repair active: {repair.IsRepairing}\nRepair status: {repair.StatusReason}");
+        text.AppendLine($"Team health report radius: {selector.SupportRange:F1}m");
         text.AppendLine($"Switch margin: {selector.SwitchScoreMargin:F1}\n");
         text.AppendLine("ALLY | MISSING HP | ROUTE METRES | DANGER | UTILITY");
         foreach (RepairTargetSelector.Candidate item in selector.Candidates)

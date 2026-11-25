@@ -83,7 +83,7 @@ namespace LastLight.AI.Director
 
         private void Update()
         {
-            if (IsPaused || Brain == null || player == null) return;
+            if (IsPaused || Time.timeScale == 0f || Brain == null || player == null) return;
 
             decisionTimer -= Time.deltaTime;
             if (decisionTimer > 0f) return;
@@ -129,6 +129,9 @@ namespace LastLight.AI.Director
                 TimeSinceDamaged = playerStatus != null ? playerStatus.TimeSinceDamaged : 999f,
                 RelaysOnline = missionProgress != null ? missionProgress.RelaysOnline : 0,
                 RelaysTotal = missionProgress != null ? missionProgress.RelaysTotal : 2,
+                AdditionalActiveRobots = FindObjectsByType<LastLight.AI.Service.ServiceRobotPatrol>(FindObjectsSortMode.None)
+                    .Count(s => s.GetComponent<DirectorRobotTag>() == null &&
+                        (s.GetComponent<Health>() == null || !s.GetComponent<Health>().IsDead)),
                 ActiveByType = activeByType,
                 AvailableByType = availableByType,
                 Bays = bayInfos
@@ -153,7 +156,7 @@ namespace LastLight.AI.Director
             {
                 if (entry.type != type) continue;
                 foreach (GameObject instance in entry.instances)
-                    if (instance != null && !instance.activeSelf) return instance;
+                    if (instance != null && !instance.activeSelf && instance.TryGetComponent(out ISpawnableAgent _)) return instance;
             }
             return null;
         }

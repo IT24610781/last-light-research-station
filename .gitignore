@@ -123,3 +123,7 @@ InitTestScene*.unity*
 Game/ProjectSettings/Packages/
 
 
+
+# Locally installed licensed environment package; see docs/Asset-Setup.md
+/Game/Assets/Creepy_Cat/
+/Game/Assets/Creepy_Cat.meta

@@ -101,7 +101,7 @@ namespace LastLight.AI.Hunter
 
         private void Update()
         {
-            if (IsPaused) return;
+            if (IsPaused || Time.timeScale == 0f) return;
 
             decisionTimer -= Time.deltaTime;
             if (decisionTimer > 0f) return;

@@ -56,6 +56,18 @@ public class RepairRobotScenarioTests : MonoBehaviour
 
         yield return Fixture();
         movement.enabled = false; repair.enabled = false;
+        a.Health.TakeDamage(50f);
+        Set(selector, "supportRange", 2f);
+        selector.EvaluateNow();
+        Check(selector.CurrentTarget == null && selector.Candidates[0].Reason.Contains("report range"),
+            "Out-of-range health reports are excluded before scoring");
+        Set(selector, "supportRange", 10f); selector.EvaluateNow();
+        Check(selector.CurrentTarget == a, "Ally entering team report range becomes eligible");
+        Set(selector, "supportRange", 2f); selector.EvaluateNow();
+        Check(selector.CurrentTarget == null, "Current ally leaving report range is released");
+
+        yield return Fixture();
+        movement.enabled = false; repair.enabled = false;
         a.Health.TakeDamage(50f); b.Health.TakeDamage(50f);
         var provider = robot.AddComponent<RepairRobotTestRoutes>();
         provider.AllyA = a.transform; provider.AllyB = b.transform;
@@ -65,6 +77,17 @@ public class RepairRobotScenarioTests : MonoBehaviour
         selector.ReportUnreachable(b, "Scenario blocked route");
         selector.EvaluateNow();
         Check(selector.CurrentTarget == a, "Blocked target cooldown selects another ally");
+
+        yield return Fixture();
+        movement.enabled = false; repair.enabled = false;
+        a.Health.TakeDamage(50f); b.Health.TakeDamage(50f);
+        Set(selector, "distancePenaltyPerMetre", 0f);
+        Set(selector, "switchScoreMargin", 0f);
+        NoiseSystem.Emit(a.RepairPosition + Vector3.right * 2f, 20f, null);
+        selector.EvaluateNow();
+        Check(sensor.HasThreat && selector.CurrentTarget == b &&
+            selector.Candidates[0].Danger > selector.Candidates[1].Danger,
+            "Equal injuries: observed noise danger lowers the exposed ally's utility");
 
         yield return Fixture();
         movement.enabled = false; repair.enabled = false;
@@ -112,10 +135,42 @@ public class RepairRobotScenarioTests : MonoBehaviour
         float stoppedHealth = a.Health.CurrentHealth;
         Time.timeScale = 0f; yield return new WaitForSecondsRealtime(0.5f);
         Check(Mathf.Approximately(stoppedHealth, a.Health.CurrentHealth), "Pause freezes repair");
+        Check(!repair.IsRepairing && repair.RepairingTarget == null &&
+            robot.GetComponent<AgentMotor>().Status == MovementStatus.Stopped &&
+            !robot.GetComponent<RepairRobotPresentation>().BeamVisible,
+            "Pause cancels repair state, beam and route");
         Time.timeScale = 1f;
-        robot.GetComponent<Health>().TakeDamage(200f); yield return Wait(0.5f);
+        yield return Wait(0.4f);
+        Check(repair.IsRepairing, "Repair resumes after pause through normal validation");
+        stoppedHealth = a.Health.CurrentHealth;
+        robot.GetComponent<Health>().TakeDamage(200f);
+        Check(!repair.IsRepairing && robot.GetComponent<AgentMotor>().Status == MovementStatus.Stopped,
+            "Death synchronously cancels repair and movement");
+        yield return Wait(0.5f);
         Check(Mathf.Approximately(stoppedHealth, a.Health.CurrentHealth) && !repair.IsRepairing,
             "Dead repair robot cannot continue healing");
+
+        yield return Fixture();
+        a.transform.position = robot.transform.position + Vector3.right * 1.7f;
+        Physics.SyncTransforms(); a.Health.TakeDamage(50f);
+        yield return Wait(0.9f);
+        Check(repair.IsRepairing, "Target death scenario starts with an active repair");
+        a.Health.TakeDamage(200f);
+        Check(!repair.IsRepairing && repair.RepairingTarget == null,
+            "Target death immediately stops repair effect");
+        yield return Wait(0.3f);
+        Check(a.Health.CurrentHealth == 0f, "Active repair never resurrects its killed target");
+
+        yield return Fixture();
+        a.transform.position = robot.transform.position + Vector3.right * 1.7f;
+        Physics.SyncTransforms(); a.Health.TakeDamage(50f);
+        yield return Wait(0.9f);
+        Check(repair.IsRepairing, "Motor pause scenario starts with an active repair");
+        robot.GetComponent<AgentMotor>().IsPaused = true;
+        float motorPausedHealth = a.Health.CurrentHealth;
+        yield return Wait(0.4f);
+        Check(!repair.IsRepairing && Mathf.Approximately(motorPausedHealth, a.Health.CurrentHealth),
+            "Member B motor pause cancels healing independently of global time scale");
 
         yield return Fixture();
         movement.enabled = false; repair.enabled = false;
@@ -143,6 +198,8 @@ public class RepairRobotScenarioTests : MonoBehaviour
         Set(sensor, "memorySeconds", 2f);
         Vector3 start = robot.transform.position;
         robot.GetComponent<Health>().TakeDamage(5f);
+        Check(!sensor.HasThreat && sensor.DangerAt(sensor.BodyPosition) > 0f,
+            "Damage marks own exposed position without inventing attacker knowledge");
         yield return Wait(1.2f);
         Check(movement.State == RepairRobotMovement.RepairState.Retreating &&
             Vector3.Distance(start, robot.transform.position) > 0.2f && !repair.IsRepairing,

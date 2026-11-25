@@ -1,0 +1,41 @@
+PASS Healthy allies: no repair target
+PASS Select injured ally
+PASS Stability retains target for small improvement
+PASS Larger utility improvement switches target
+PASS Full-health target is replaced
+PASS Dead target excluded; no resurrection
+PASS Robot cannot select itself
+PASS Out-of-range health reports are excluded before scoring
+PASS Ally entering team report range becomes eligible
+PASS Current ally leaving report range is released
+PASS Uses supplied route cost, not straight-line distance
+PASS Blocked target cooldown selects another ally
+PASS Equal injuries: observed noise danger lowers the exposed ally's utility
+PASS Disabled ally excluded
+PASS Checked direct fallback rejects obstructed repair routes
+PASS Unreachable target retried after obstacle removal/cooldown
+PASS Repair increases health gradually, not instantly
+PASS Wall stops repair immediately
+PASS Repair resumes and clamps at maximum health
+PASS No repair beyond range
+PASS Dead ally never repaired
+PASS AgentMotor approaches an injured ally
+PASS Approach transitions to repair
+PASS Pause freezes repair
+PASS Pause cancels repair state, beam and route
+PASS Repair resumes after pause through normal validation
+PASS Death synchronously cancels repair and movement
+PASS Dead repair robot cannot continue healing
+PASS Target death scenario starts with an active repair
+PASS Target death immediately stops repair effect
+PASS Active repair never resurrects its killed target
+PASS Motor pause scenario starts with an active repair
+PASS Member B motor pause cancels healing independently of global time scale
+PASS Vision detects an exposed player in the view cone
+PASS Hidden player movement does not update remembered location
+PASS Threat memory expires
+PASS Noise records an audible source observation
+PASS Damage marks own exposed position without inventing attacker knowledge
+PASS Immediate danger interrupts repairs and retreats to reachable support
+PASS No injured allies: waits at reachable support after danger expires
+PASS Production prefab supplies animation presentation

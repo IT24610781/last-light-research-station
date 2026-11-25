@@ -6,6 +6,8 @@ using UnityEngine;
 public class RepairTargetSelector : MonoBehaviour
 {
     [SerializeField] private RepairableAlly[] allies = new RepairableAlly[0];
+    [Tooltip("Team health reports are available only inside this support radius. This grants no player tracking.")]
+    [SerializeField, Min(0.1f)] private float supportRange = 25f;
     [SerializeField, Min(0.1f)] private float reconsiderInterval = 0.5f;
     [SerializeField, Min(0f)] private float missingHealthWeight = 100f;
     [Tooltip("Penalty per metre of the returned route, not straight-line target distance.")]
@@ -28,6 +30,7 @@ public class RepairTargetSelector : MonoBehaviour
     public string Decision { get; private set; } = "Waiting for first observation";
     public IReadOnlyList<Candidate> Candidates => candidates;
     public float SwitchScoreMargin => switchScoreMargin;
+    public float SupportRange => supportRange;
 
     private readonly List<Candidate> candidates = new List<Candidate>();
     private readonly List<Vector3> scratchRoute = new List<Vector3>();
@@ -77,6 +80,7 @@ public class RepairTargetSelector : MonoBehaviour
     public bool Eligible(RepairableAlly ally) => ally != null && ally.isActiveAndEnabled &&
         ally.Health != null && ally.Health.isActiveAndEnabled && ally.Health != ownHealth &&
         !ally.transform.IsChildOf(transform) && !transform.IsChildOf(ally.transform) &&
+        Vector3.Distance(sensor.BodyPosition, ally.RepairPosition) <= supportRange &&
         !ally.Health.IsDead && ally.Health.CurrentHealth < ally.Health.MaximumHealth;
 
     public void ReportUnreachable(RepairableAlly ally, string reason)
@@ -90,14 +94,26 @@ public class RepairTargetSelector : MonoBehaviour
     }
     public void EvaluateNow()
     {
-        if (!isActiveAndEnabled || ownHealth.IsDead || sensor.ImmediateDanger) return;
+        if (!isActiveAndEnabled || ownHealth.IsDead || Time.timeScale == 0f) return;
+        if (sensor.ImmediateDanger)
+        {
+            CurrentTarget = null;
+            Decision = "Immediate observed danger: retreat to a reachable support position";
+            return;
+        }
         candidates.Clear();
         Candidate best = null, current = null;
         foreach (RepairableAlly ally in allies)
         {
             Candidate item = new Candidate { Ally = ally, Score = float.NegativeInfinity };
             candidates.Add(item);
-            if (!Eligible(ally)) { item.Reason = "Self, dead, full health, disabled or missing"; continue; }
+            if (!Eligible(ally))
+            {
+                item.Reason = ally != null && Vector3.Distance(sensor.BodyPosition, ally.RepairPosition) > supportRange
+                    ? $"Outside team report range ({supportRange:F1}m)"
+                    : "Self, dead, full health, disabled or missing";
+                continue;
+            }
             if (retryAfter.TryGetValue(ally, out float retry) && Time.time < retry)
             { item.Reason = $"Blocked/unreachable: retry in {retry - Time.time:F1}s"; continue; }
             item.MissingHealth = ally.Health.MaximumHealth - ally.Health.CurrentHealth;
