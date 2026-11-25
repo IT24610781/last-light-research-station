@@ -83,7 +83,7 @@ namespace LastLight.AI.Director
 
         private void Update()
         {
-            if (IsPaused || Brain == null || player == null) return;
+            if (IsPaused || Time.timeScale == 0f || Brain == null || player == null) return;
 
             decisionTimer -= Time.deltaTime;
             if (decisionTimer > 0f) return;
@@ -129,6 +129,9 @@ namespace LastLight.AI.Director
                 TimeSinceDamaged = playerStatus != null ? playerStatus.TimeSinceDamaged : 999f,
                 RelaysOnline = missionProgress != null ? missionProgress.RelaysOnline : 0,
                 RelaysTotal = missionProgress != null ? missionProgress.RelaysTotal : 2,
+                AdditionalActiveRobots = FindObjectsByType<LastLight.AI.Service.ServiceRobotPatrol>(FindObjectsSortMode.None)
+                    .Count(s => s.GetComponent<DirectorRobotTag>() == null &&
+                        (s.GetComponent<Health>() == null || !s.GetComponent<Health>().IsDead)),
                 ActiveByType = activeByType,
                 AvailableByType = availableByType,
                 Bays = bayInfos
@@ -153,7 +156,7 @@ namespace LastLight.AI.Director
             {
                 if (entry.type != type) continue;
                 foreach (GameObject instance in entry.instances)
-                    if (instance != null && !instance.activeSelf) return instance;
+                    if (instance != null && !instance.activeSelf && instance.TryGetComponent(out ISpawnableAgent _)) return instance;
             }
             return null;
         }
@@ -213,7 +216,7 @@ namespace LastLight.AI.Director
 
         private void OnGUI()
         {
-            if (!showOverlay || Brain == null) return;
+            if (!(showOverlay || LastLight.Core.DebugOverlays.Director) || Brain == null) return;
 
             var text = new System.Text.StringBuilder();
             text.AppendLine("<b>Encounter Director</b>");
@@ -229,7 +232,9 @@ namespace LastLight.AI.Director
             foreach (DirectorCandidate c in Brain.Candidates.Where(c => c.RejectedReason != null).Take(6))
                 text.AppendLine($"  {c.Label}: rejected ({c.RejectedReason})");
 
-            var area = new Rect(Screen.width - 470, 10, 460, 90 + 18 * Mathf.Min(12, Brain.Candidates.Count));
+            // Sit below the Guard panel when both are shown.
+            float top = LastLight.Core.DebugOverlays.Guard ? 270f : 10f;
+            var area = new Rect(Screen.width - 470, top, 460, 90 + 18 * Mathf.Min(12, Brain.Candidates.Count));
             GUI.Box(area, GUIContent.none);
             GUI.Box(area, GUIContent.none);
             var style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 13 };

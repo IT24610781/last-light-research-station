@@ -35,7 +35,7 @@ public class PlayerInteractor : MonoBehaviour
 
     private void Update()
     {
-        if (Cursor.lockState != CursorLockMode.Locked)
+        if (Time.timeScale == 0f || Cursor.lockState != CursorLockMode.Locked)
         {
             return;
         }
@@ -54,7 +54,7 @@ public class PlayerInteractor : MonoBehaviour
             return;
         }
 
-        if (!interactAction.WasPressedThisFrame())
+        if (!interactAction.IsPressed())
         {
             return;
         }
@@ -71,6 +71,14 @@ public class PlayerInteractor : MonoBehaviour
         {
             return;
         }
+
+        StationRelay relay = hit.collider.GetComponentInParent<StationRelay>();
+        if (relay != null)
+        {
+            relay.Interact();
+            return;
+        }
+        if (!interactAction.WasPressedThisFrame()) return;
 
         CarryableObject carryable =
             hit.collider.GetComponentInParent<CarryableObject>();

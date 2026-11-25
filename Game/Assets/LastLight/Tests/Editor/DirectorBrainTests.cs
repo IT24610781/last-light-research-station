@@ -45,6 +45,17 @@ namespace LastLight.Tests
         };
 
         [Test]
+        public void NeutralServiceRobot_CountsTowardPopulationCap()
+        {
+            var observation = Calm();
+            observation.ActiveByType = new[] { 1, 1, 2 };
+            observation.AdditionalActiveRobots = 1;
+            var decision = brain.Decide(observation);
+            Assert.IsFalse(decision.Activate);
+            StringAssert.Contains("Active cap", decision.Reason);
+        }
+
+        [Test]
         public void CalmSituation_ActivatesARobot()
         {
             DirectorDecision decision = brain.Decide(Calm());

@@ -1,0 +1,321 @@
+{
+  "status": "completed",
+  "duration": 0.23,
+  "summary": {
+    "total": 44,
+    "passed": 44,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.ActiveCap_PreventsActivation",
+      "Status": "Passed",
+      "Duration": 0.0228805,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.CalmSituation_ActivatesARobot",
+      "Status": "Passed",
+      "Duration": 0.0034441,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.Cooldown_PreventsActivation",
+      "Status": "Passed",
+      "Duration": 0.0003756,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.ExhaustedBudget_PreventsActivation_EvenAfterDeaths",
+      "Status": "Passed",
+      "Duration": 0.0001976,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.HighPressure_DirectorWaits",
+      "Status": "Passed",
+      "Duration": 0.0001457,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.LowHealthPlayer_DirectorWaits",
+      "Status": "Passed",
+      "Duration": 0.0001864,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.NeutralServiceRobot_CountsTowardPopulationCap",
+      "Status": "Passed",
+      "Duration": 0.0023765,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.NoSafeBay_DirectorWaits",
+      "Status": "Passed",
+      "Duration": 0.0003545,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.RepairRobot_RejectedWhenNobodyToSupport",
+      "Status": "Passed",
+      "Duration": 0.0007426,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.DirectorBrainTests.Reset_ClearsActivationCounter",
+      "Status": "Passed",
+      "Duration": 0.0087363,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.CompetingNoises_ChoosesStrongerWhenEquallyRecentAndFar",
+      "Status": "Passed",
+      "Duration": 0.0023392,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.CompetingNoises_NearerNoiseCanBeatSlightlyLouderFarNoise",
+      "Status": "Passed",
+      "Duration": 0.0003776,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.Hysteresis_DoesNotSwitchForSlightlyBetterNoise",
+      "Status": "Passed",
+      "Duration": 0.0018658,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.LostSight_ChasesLastSeenPositionNotHiddenPlayer",
+      "Status": "Passed",
+      "Duration": 0.0136506,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.Reset_ClearsStateAndTarget",
+      "Status": "Passed",
+      "Duration": 0.0007281,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.StaleEvidence_IsForgottenAfterMemoryDuration",
+      "Status": "Passed",
+      "Duration": 0.0012632,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.UnreachableNoise_IsRejectedInsteadOfRetried",
+      "Status": "Passed",
+      "Duration": 0.0061615,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterBrainTests.VisiblePlayerInRange_Attacks",
+      "Status": "Passed",
+      "Duration": 0.0006307,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterMemoryTests.FullMemory_ForgetsOldestNoise",
+      "Status": "Passed",
+      "Duration": 0.0011945,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterMemoryTests.LastSeen_ExpiresAfterDuration",
+      "Status": "Passed",
+      "Duration": 0.0001576,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LastLight.Tests.HunterMemoryTests.NearbyNoises_AreMergedIntoOne",
+      "Status": "Passed",
+      "Duration": 0.0013823,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.EmptyMagazine_ReloadsAndNeverAttacks_EvenWithoutCover",
+      "Status": "Passed",
+      "Duration": 0.0003067,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.HealthyWithVisibleTarget_ChoosesAttack",
+      "Status": "Passed",
+      "Duration": 0.0001719,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.InvalidCurrentAction_OverridesHoldTimeImmediately",
+      "Status": "Passed",
+      "Duration": 0.0010377,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.LowHealthWithRetreatPoint_ChoosesRetreat",
+      "Status": "Passed",
+      "Duration": 9.44E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.MinimumDuration_HoldsCurrentActionEvenIfAnotherScoresHigher",
+      "Status": "Passed",
+      "Duration": 0.0002777,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.NoCoverAvailable_CoverIsInvalidAndGuardStillActs",
+      "Status": "Passed",
+      "Duration": 0.0001702,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.NothingUsefulAvailable_FallsBackToHold",
+      "Status": "Passed",
+      "Duration": 9.52E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.OutOfRangeInputs_AreClampedAndScoresStayInZeroToOne",
+      "Status": "Passed",
+      "Duration": 0.0003086,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.Reset_ClearsCurrentAction",
+      "Status": "Passed",
+      "Duration": 0.0007962,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GuardUtilityBrainTests.SwitchMargin_SmallAdvantageDoesNotSwitch_LargeAdvantageDoes",
+      "Status": "Passed",
+      "Duration": 0.0010137,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PathFinderTests.AStarCost_MatchesDijkstraBaseline_OnRandomGraph",
+      "Status": "Passed",
+      "Duration": 0.0169847,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PathFinderTests.ClosedConnection_ForcesDetour_ThenFailure_ThenReopens",
+      "Status": "Passed",
+      "Duration": 0.0066875,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PathFinderTests.FindsKnownShortestRoute",
+      "Status": "Passed",
+      "Duration": 0.000759,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PathFinderTests.InvalidNodes_ReturnFailureNotException",
+      "Status": "Passed",
+      "Duration": 0.001197,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PathFinderTests.StartEqualsGoal_ReturnsSingleNodeZeroCost",
+      "Status": "Passed",
+      "Duration": 0.0013574,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PathFinderTests.UnreachableGoal_ReturnsExplicitFailure",
+      "Status": "Passed",
+      "Duration": 0.0023764,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.DoorInteractionCannotBypassRelayRequirements(RelayA)",
+      "Status": "Passed",
+      "Duration": 0.0087661,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.DoorInteractionCannotBypassRelayRequirements(RelayB)",
+      "Status": "Passed",
+      "Duration": 0.0027832,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.DoorInteractionCannotBypassRelayRequirements(BothRelays)",
+      "Status": "Passed",
+      "Duration": 0.0025856,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.InterruptedRelayHoldDoesNotActivateOrRetainProgress",
+      "Status": "Passed",
+      "Duration": 0.0033523,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.LockedDoorFailsClosedWithoutProgressionManager",
+      "Status": "Passed",
+      "Duration": 0.0004305,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.RelayCanOnlyActivateOnce",
+      "Status": "Passed",
+      "Duration": 0.0010983,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StationProgressionTests.RelayLockedDoorsFollowMissionProgress",
+      "Status": "Passed",
+      "Duration": 0.003126,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

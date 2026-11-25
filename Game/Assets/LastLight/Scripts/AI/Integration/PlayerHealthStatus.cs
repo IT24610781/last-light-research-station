@@ -23,7 +23,13 @@ namespace LastLight.AI.Integration
 
         private void Awake() => health = GetComponent<Health>();
 
-        private void OnEnable() => health.HealthChanged += OnHealthChanged;
+        private void OnEnable()
+        {
+            lastHealth = health.CurrentHealth;
+            health.HealthChanged += OnHealthChanged;
+        }
+
+        private void Start() => lastHealth = health.CurrentHealth;
 
         private void OnDisable() => health.HealthChanged -= OnHealthChanged;
 

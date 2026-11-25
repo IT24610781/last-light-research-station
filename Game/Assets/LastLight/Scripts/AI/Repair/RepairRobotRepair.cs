@@ -11,6 +11,7 @@ public class RepairRobotRepair : MonoBehaviour
     [SerializeField] private LayerMask repairBlockingLayers = ~0;
     public bool IsRepairing { get; private set; }
     public float RepairRange => repairRange;
+    public string StatusReason { get; private set; } = "Waiting for a valid repair target";
     public RepairableAlly RepairingTarget { get; private set; }
     // Member B can use this event for the repair animation/beam.
     public event Action<bool> RepairStateChanged;
@@ -27,16 +28,21 @@ public class RepairRobotRepair : MonoBehaviour
         movement = GetComponent<RepairRobotMovement>(); sensor = GetComponent<RepairRobotSensor>();
         motor = GetComponent<AgentMotor>();
     }
+    private void OnEnable() { ownHealth.Died += HandleDeath; }
+    private void HandleDeath(GameObject source) { StopRepairing("Repair robot died"); }
     private void Update()
     {
-        if (Time.timeScale == 0f) return;
+        if (Time.timeScale == 0f || motor.IsPaused) { StopRepairing("Paused"); return; }
         RepairableAlly target = selector.CurrentTarget;
-        if (ownHealth.IsDead || motor.IsPaused || sensor.ImmediateDanger ||
-            !selector.isActiveAndEnabled || !movement.ReadyToRepair || !CanRepair(target))
-        { StopRepairing(); return; }
+        if (ownHealth.IsDead) { StopRepairing("Repair robot died"); return; }
+        if (sensor.ImmediateDanger) { StopRepairing("Immediate observed danger"); return; }
+        if (!selector.isActiveAndEnabled || !movement.ReadyToRepair || !CanRepair(target))
+        { StopRepairing("Target unavailable, approaching, out of range or line of sight blocked"); return; }
         if (RepairingTarget != target)
         {
             StopRepairing(); RepairingTarget = target; IsRepairing = true;
+            target.Health.HealthChanged += OnTargetHealthChanged;
+            StatusReason = "Repairing " + target.name;
             RepairStateChanged?.Invoke(true);
         }
         accumulatedTime += Time.deltaTime;
@@ -54,11 +60,22 @@ public class RepairRobotRepair : MonoBehaviour
             RepairVisibility.Clear(sensor.EyePosition, target.RepairPosition,
                 transform, target.transform, repairBlockingLayers);
     }
-    private void StopRepairing()
+    private void OnTargetHealthChanged(float current, float maximum)
+    {
+        if (current <= 0f || current >= maximum)
+            StopRepairing(current <= 0f ? "Target died" : "Target fully repaired");
+    }
+    private void StopRepairing(string reason = "Repair stopped")
     {
         bool wasRepairing = IsRepairing;
+        if (RepairingTarget != null) RepairingTarget.Health.HealthChanged -= OnTargetHealthChanged;
         IsRepairing = false; RepairingTarget = null; accumulatedTime = 0f;
+        StatusReason = reason;
         if (wasRepairing) RepairStateChanged?.Invoke(false);
     }
-    private void OnDisable() { StopRepairing(); }
+    private void OnDisable()
+    {
+        if (ownHealth != null) ownHealth.Died -= HandleDeath;
+        StopRepairing("Repair component disabled");
+    }
 }

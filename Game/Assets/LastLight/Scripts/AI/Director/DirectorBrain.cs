@@ -21,6 +21,7 @@ namespace LastLight.AI.Director
         public float TimeSinceDamaged;
         public int RelaysOnline;
         public int RelaysTotal;
+        public int AdditionalActiveRobots; // Neutral robots count toward the population cap, not threat pressure.
         public int[] ActiveByType;      // indexed by (int)RobotType
         public bool[] AvailableByType;  // an inactive pooled instance exists
         public IReadOnlyList<BayInfo> Bays;
@@ -97,7 +98,7 @@ namespace LastLight.AI.Director
             int hunters = o.ActiveByType[(int)RobotType.Hunter];
             int guards = o.ActiveByType[(int)RobotType.Guard];
             int repairs = o.ActiveByType[(int)RobotType.Repair];
-            int active = hunters + guards + repairs;
+            int active = hunters + guards + repairs + Mathf.Max(0, o.AdditionalActiveRobots);
 
             // Pressure model 
             float progress = o.RelaysTotal > 0 ? Mathf.Clamp01((float)o.RelaysOnline / o.RelaysTotal) : 0f;

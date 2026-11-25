@@ -6,6 +6,8 @@ public sealed class StationWeaponPickup : MonoBehaviour, IInteractable
 
     [SerializeField] private WeaponType weapon;
 
+    public WeaponType Type => weapon;
+
     public void Configure(WeaponType type) => weapon = type;
 
     public void Interact()
@@ -17,6 +19,10 @@ public sealed class StationWeaponPickup : MonoBehaviour, IInteractable
             ? shooter.AcquireRifle()
             : shooter.AcquirePistol();
 
-        if (acquired) gameObject.SetActive(false);
+        if (acquired)
+        {
+            StationAudioDirector.Instance?.PlayPickup(transform.position);
+            gameObject.SetActive(false);
+        }
     }
 }

@@ -44,7 +44,16 @@ public class RepairRobotMovement : MonoBehaviour
         planner = GetComponent<RepairRoutePlanner>(); sensor = GetComponent<RepairRobotSensor>();
         motor = GetComponent<AgentMotor>(); home = transform.position;
     }
-    private void OnEnable() { nextRouteTime = 0f; hasRoute = false; }
+    private void OnEnable()
+    {
+        nextRouteTime = 0f; hasRoute = false;
+        health.Died += HandleDeath;
+    }
+    private void HandleDeath(GameObject source)
+    {
+        Stop(); State = RepairState.Dead; MovementReason = "Dead";
+        motor.enabled = false;
+    }
     private void Update()
     {
         if (health.IsDead)
@@ -52,7 +61,11 @@ public class RepairRobotMovement : MonoBehaviour
             Stop(); State = RepairState.Dead; MovementReason = "Dead";
             motor.enabled = false; return;
         }
-        if (Time.timeScale == 0f || motor.IsPaused) return;
+        if (Time.timeScale == 0f || motor.IsPaused)
+        {
+            Stop(); State = RepairState.Waiting; MovementReason = "Paused: route and repair cancelled";
+            nextRouteTime = 0f; return;
+        }
         if (!selector.isActiveAndEnabled) { Stop(); State = RepairState.Waiting; return; }
         if (sensor.ImmediateDanger) { MoveToSupport(true); return; }
         RepairableAlly target = selector.CurrentTarget;
@@ -137,7 +150,7 @@ public class RepairRobotMovement : MonoBehaviour
             supportScores.Add($"{(i == -1 ? "Home" : supportPositions[i].name)}: " +
                 $"score {score:F1}, route {cost:F1}m, danger {danger:F2}");
             if (score <= bestScore) continue;
-            bestScore = score; bestIndex = i; bestPoint = point;
+            bestScore = score; bestIndex = i; bestPoint = route[route.Count - 1];
             bestPath.Clear(); bestPath.AddRange(route);
         }
         if (bestIndex == -2)
@@ -174,6 +187,7 @@ public class RepairRobotMovement : MonoBehaviour
     }
     private void OnDisable()
     {
+        if (health != null) health.Died -= HandleDeath;
         if (motor != null) Stop();
         supporting = false;
     }

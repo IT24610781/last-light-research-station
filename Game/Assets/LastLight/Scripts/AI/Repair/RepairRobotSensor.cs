@@ -21,6 +21,8 @@ public class RepairRobotSensor : MonoBehaviour
     private float threatStrength;
     private float emergencyUntil;
     private Vector3 lastThreatPosition;
+    private Vector3 lastDamagePosition;
+    private float damageTime = float.NegativeInfinity;
 
     public bool PlayerVisible { get; private set; }
     public bool HasThreat => Time.time - threatTime < memorySeconds;
@@ -38,6 +40,8 @@ public class RepairRobotSensor : MonoBehaviour
     private void OnEnable()
     {
         threatTime = float.NegativeInfinity;
+        damageTime = float.NegativeInfinity;
+        previousHealth = ownHealth.CurrentHealth;
         emergencyUntil = 0f;
         PlayerVisible = false;
         NoiseSystem.NoiseProduced += HearNoise;
@@ -87,6 +91,9 @@ public class RepairRobotSensor : MonoBehaviour
         {
             // Damage confirms danger, but does not reveal the attacker's location.
             emergencyUntil = Time.time + memorySeconds;
+            // Only our own exposed position is known, not the attacker's location.
+            lastDamagePosition = BodyPosition;
+            damageTime = Time.time;
             Observation = "Taking damage (attacker location unknown unless observed)";
         }
         previousHealth = current;
@@ -119,10 +126,12 @@ public class RepairRobotSensor : MonoBehaviour
     }
     public float DangerAt(Vector3 position)
     {
-        if (!HasThreat) return 0f;
+        float exposure = Mathf.Clamp01(1f - (Time.time - damageTime) / memorySeconds) *
+            Mathf.Clamp01(1f - Vector3.Distance(position, lastDamagePosition) / immediateDangerDistance);
+        if (!HasThreat) return exposure;
         float freshness = Mathf.Clamp01(1f - (Time.time - threatTime) / memorySeconds);
         float proximity = Mathf.Clamp01(1f -
             Vector3.Distance(position, lastThreatPosition) / viewDistance);
-        return threatStrength * freshness * proximity;
+        return Mathf.Max(exposure, threatStrength * freshness * proximity);
     }
 }

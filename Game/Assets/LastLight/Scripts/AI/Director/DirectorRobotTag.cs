@@ -22,7 +22,8 @@ namespace LastLight.AI.Director
         {
             int count = 0;
             foreach (DirectorRobotTag tag in active)
-                if (tag.type == robotType) count++;
+                if (tag != null && tag.type == robotType &&
+                    (!tag.TryGetComponent(out Health health) || !health.IsDead)) count++;
             return count;
         }
 

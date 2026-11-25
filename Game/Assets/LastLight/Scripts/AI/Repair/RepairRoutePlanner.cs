@@ -7,6 +7,8 @@ public class RepairRoutePlanner : MonoBehaviour
 {
     [Tooltip("Member A's MonoBehaviour implementing IPathProvider. Empty = checked direct test routes.")]
     [SerializeField] private MonoBehaviour pathProvider;
+    [Tooltip("Enable for floor-level NavMesh paths. Converts floor coordinates to this controller's root height.")]
+    [SerializeField] private bool groundLevelPaths;
     [SerializeField] private LayerMask obstacleLayers = ~0;
     [SerializeField, Min(0.1f)] private float approachDistance = 1.5f;
     [SerializeField, Min(0.1f)] private float repairRange = 2f;
@@ -47,6 +49,10 @@ public class RepairRoutePlanner : MonoBehaviour
             if (!RepairVisibility.Clear(goal + BodyOffset + Vector3.up * 0.3f,
                 ally.RepairPosition, transform, ally.transform, obstacleLayers)) continue;
             if (!TryPlanPoint(goal, candidatePath, out float candidateCost)) continue;
+            Vector3 endBody = candidatePath[candidatePath.Count - 1] + BodyOffset;
+            if (Vector3.Distance(endBody, ally.RepairPosition) > range ||
+                !RepairVisibility.Clear(endBody + Vector3.up * 0.3f, ally.RepairPosition,
+                    transform, ally.transform, obstacleLayers)) continue;
             if (candidateCost < cost)
             {
                 cost = candidateCost; path.Clear(); path.AddRange(candidatePath);
@@ -58,7 +64,7 @@ public class RepairRoutePlanner : MonoBehaviour
     public bool TryPlanPoint(Vector3 goal, List<Vector3> path, out float cost)
     {
         path.Clear(); cost = float.PositiveInfinity;
-        if (!Finite(goal) || Occupied(goal)) return false;
+        if (!Finite(goal)) return false;
         if (!IsFallback)
         {
             bool found = ((IPathProvider)pathProvider).TryFindPath(
@@ -67,12 +73,25 @@ public class RepairRoutePlanner : MonoBehaviour
                 float.IsInfinity(cost) || cost < 0f) { path.Clear(); return false; }
             foreach (Vector3 point in path)
                 if (!Finite(point)) { path.Clear(); return false; }
-            if (Vector3.Distance(path[path.Count - 1], goal) > 0.5f)
+            Vector3 end = path[path.Count - 1];
+            if (groundLevelPaths)
+            {
+                float rootLift = Controller.height * Mathf.Abs(transform.lossyScale.y) * 0.5f -
+                    BodyOffset.y + Controller.skinWidth;
+                for (int i = 0; i < path.Count; i++) path[i] += Vector3.up * rootLift;
+                // Floor projection may legitimately differ from a torso-level requested point.
+                Vector3 planarError = end - goal; planarError.y = 0f;
+                if (planarError.magnitude > 0.5f || Mathf.Abs(end.y - goal.y) > 2f)
+                { path.Clear(); return false; }
+            }
+            else if (Vector3.Distance(end, goal) > 0.5f)
             { path.Clear(); return false; }
+            if (Occupied(path[path.Count - 1])) { path.Clear(); return false; }
             return true;
         }
 
         // Explicitly a single-floor test fallback, not an A* replacement.
+        if (Occupied(goal)) return false;
         if (Mathf.Abs(goal.y - transform.position.y) > 0.4f) return false;
         Vector3 delta = goal - transform.position;
         Capsule(transform.position, out Vector3 bottom, out Vector3 top, out float radius);

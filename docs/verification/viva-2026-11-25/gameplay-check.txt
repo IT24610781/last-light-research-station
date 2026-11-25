@@ -1,0 +1,64 @@
+PASS Game opens on the start screen
+PASS ENTER STATION starts play
+PASS Player starts unarmed (weapons are collected in the Armory)
+PASS No unsupported/missing materials on active renderers (0)
+     bench weapons available: 5
+PASS Interaction ray can hit the Pistol on the Armory bench
+PASS HUD prompt shows "[E]  TAKE PISTOL"
+PASS Pistol collected and removed from the bench
+PASS Pistol equipped with a full magazine (8)
+PASS Interaction ray can hit the Rifle on the Armory bench
+PASS HUD prompt shows "[E]  TAKE RIFLE"
+PASS Rifle collected and removed from the bench
+PASS Rifle equipped with a full magazine (12)
+PASS Medkit is targetable with a USE MEDKIT prompt
+PASS Medkit heals the player (60 -> 95)
+PASS Prop 'Movable Barricade' is targetable
+PASS Player picks up the prop (E)
+PASS Prop is thrown (Q) at 4.8 m/s
+     doors: 10, RelayA-locked: 1, both-relays-locked: 1
+PASS Unlocked door opens/closes with E
+PASS Yellow door stays locked before Relay A
+PASS Red evacuation door stays locked before both relays
+PASS Evacuation refused while relays are offline
+PASS Relay A is targetable
+PASS Relay A shows the hold prompt
+PASS Releasing E early resets Relay A
+PASS Holding E for 2 s activates Relay A
+PASS Relays online: 1/2 (duplicate hold ignored)
+PASS Relay A unlocks the yellow door
+PASS Red door still locked with one relay
+PASS Relay B is targetable
+PASS Relay B shows the hold prompt
+PASS Releasing E early resets Relay B
+PASS Holding E for 2 s activates Relay B
+PASS Relays online: 2/2 (duplicate hold ignored)
+PASS Both relays unlock the red evacuation door
+PASS Evacuation terminal is targetable
+PASS Evacuating alive with both relays wins
+PASS Restart returns to the start screen
+PASS Restart restores unarmed player and all 5 bench weapons
+PASS Restart resets both relays
+PASS Evacuation bay has an exit trigger
+PASS Walking into the evacuation bay with both relays wins
+PASS Escape pauses and freezes time
+PASS Resume continues play
+PASS Sound Hunter is patrolling before the noise (no fake start-up noise): Patrol
+PASS Sound Hunter hears the dropped crate and investigates its position (Investigate; Investigating best-scoring noise (score 0.77))
+PASS Room names match the built walls (HUD title and map)
+PASS Service robot body rests on the floor (gap +0.082 m)
+PASS Enlarged barricade (scale 1.35) is targetable
+PASS Player can pick up and move the enlarged barricade
+PASS A Repair Robot works on the ground floor (Storage)
+PASS Storage Repair Robot selects the injured Hunter (Choose Storage Sound Hunter: score 32.8; injury +40.0, route -7.2, danger -0.0)
+PASS Storage Repair Robot repairs the Hunter (60 -> 65 HP)
+PASS In-game map is present
+PASS No robot marker on the map while no robot is firing
+PASS Guard firing shows its marker on the map
+PASS Marker disappears after the robot stops firing
+PASS Station runs 6 s with every agent active and the player safe in Arrival
+PASS Zero health shows defeat
+PASS Exit cannot award victory after death
+PASS No errors or exceptions logged during the run (0)
+RESULT: ALL PASSED
+COMPLETE

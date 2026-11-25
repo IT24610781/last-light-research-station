@@ -18,6 +18,12 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
     public AudioClip doorOpenSound;
     public enum AccessRequirement { None, RelayA, RelayB, BothRelays }
     public AccessRequirement requiredAccess = AccessRequirement.None;
+    public AccessRequirement Requirement => requiredAccess;
+    public bool CanOpen => requiredAccess == AccessRequirement.None ||
+        (StationProgressionManager.Instance != null &&
+         StationProgressionManager.Instance.CanOpen(requiredAccess));
+
+    public void ConfigureAccess(AccessRequirement requirement) => requiredAccess = requirement;
 
     public void Configure(Transform left, Transform right)
     {
@@ -36,6 +42,11 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
 
     public void Interact() 
        {
+        if (!CanOpen)
+        {
+            StationProgressionManager.Instance?.ReportLocked(requiredAccess);
+            return;
+        }
         open = !open;
         
         if (doorAudio != null && doorOpenSound != null) 
@@ -46,7 +57,21 @@ public sealed class StationSlidingDoor : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (Time.timeScale == 0f) return;
         if (leftLeaf == null || rightLeaf == null) return;
+        // Robots use the same access rules as the player. A closed unlocked door
+        // must not leave an otherwise valid route permanently blocked.
+        if (!open && CanOpen)
+        {
+            foreach (Collider nearby in Physics.OverlapSphere(transform.position, 2f,
+                         Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                var motor = nearby.GetComponentInParent<LastLight.AI.Movement.AgentMotor>();
+                var health = nearby.GetComponentInParent<Health>();
+                if (motor != null && motor.isActiveAndEnabled &&
+                    (health == null || !health.IsDead)) { open = true; break; }
+            }
+        }
         // Reopen rather than closing onto a character or a carried physics object.
         if (!open && fraction > 0f)
         {
