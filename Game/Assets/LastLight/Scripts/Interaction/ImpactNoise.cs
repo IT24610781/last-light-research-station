@@ -7,8 +7,13 @@ public class ImpactNoise : MonoBehaviour
     [SerializeField] private float noiseMultiplier = 1f;
     [SerializeField] private float cooldown = 0.4f;
     [SerializeField] private bool logNoise = true;
+    [Tooltip("Ignore impacts for this long after the prop is enabled, so a prop settling " +
+             "onto the floor at level start or restart does not produce a fake noise.")]
+    [SerializeField, Min(0f)] private float settleTime = 1f;
 
     private float nextNoiseTime;
+
+    private void OnEnable() => nextNoiseTime = Time.time + settleTime;
 
     private void OnCollisionEnter(Collision collision)
     {

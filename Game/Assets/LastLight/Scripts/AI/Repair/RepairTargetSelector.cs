@@ -51,10 +51,12 @@ public class RepairTargetSelector : MonoBehaviour
     {
         nextSelectionTime = 0f; lastLogKey = null; retryAfter.Clear();
         ownHealth.Died += HandleDeath;
+        if (!overlayOrder.Contains(this)) overlayOrder.Add(this);
     }
     private void OnDisable()
     {
         ownHealth.Died -= HandleDeath;
+        overlayOrder.Remove(this);
         CurrentTarget = null;
     }
     private void HandleDeath(GameObject source)
@@ -152,4 +154,46 @@ public class RepairTargetSelector : MonoBehaviour
         Mathf.Clamp01(danger) * Mathf.Max(0f, dangerWeight);
     public static bool ShouldSwitch(float current, float challenger, float margin) =>
         challenger - current > Mathf.Max(0f, margin);
+
+    // ---------- In-game decision overlay (F3) ----------
+    private static readonly List<RepairTargetSelector> overlayOrder = new List<RepairTargetSelector>();
+
+    private void OnGUI()
+    {
+        if (!LastLight.Core.DebugOverlays.Repair || ownHealth == null) return;
+
+        RepairRobotRepair repair = GetComponent<RepairRobotRepair>();
+        var text = new System.Text.StringBuilder();
+        text.AppendLine($"<b>{name}</b>  HP {ownHealth.CurrentHealth:0}/{ownHealth.MaximumHealth:0}" +
+            $"   Target: {(CurrentTarget != null ? CurrentTarget.name : "none")}");
+        text.AppendLine($"U = {missingHealthWeight:0}×missing − {distancePenaltyPerMetre:0}×route m − {dangerPenalty:0}×danger" +
+            $"   (switch margin {switchScoreMargin:0}, range {supportRange:0} m)");
+        text.AppendLine("Decision: " + Decision);
+        if (repair != null)
+            text.AppendLine((repair.IsRepairing ? "<color=#5CF2E0>REPAIRING</color>  " : "") + repair.StatusReason);
+        int rows = 0;
+        foreach (Candidate c in candidates)
+        {
+            if (c.Ally == null || rows >= 5) continue;
+            string marker = c.Ally == CurrentTarget ? "> " : "  ";
+            text.AppendLine(c.Eligible
+                ? $"{marker}{c.Ally.name}: U {c.Score:0.0}  (missing {c.MissingHealth:0} HP, route {c.RouteCost:0.0} m, danger {c.Danger:0.00})"
+                : $"{marker}{c.Ally.name}: rejected ({c.Reason})");
+            rows++;
+        }
+
+        float height = 100f + 18f * rows;
+        float top = Screen.height * 0.38f;
+        foreach (RepairTargetSelector other in overlayOrder)
+        {
+            if (other == this) break;
+            if (other.isActiveAndEnabled) top += 110f + 18f * Mathf.Min(5, other.candidates.Count);
+        }
+        Rect area = new Rect(10f, top, 640f, height);
+        GUI.Box(area, GUIContent.none);
+        GUI.Box(area, GUIContent.none);
+        GUIStyle style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 13 };
+        style.normal.textColor = Color.white;
+        GUI.Label(new Rect(area.x + 8f, area.y + 4f, area.width - 16f, area.height), text.ToString(), style);
+    }
 }

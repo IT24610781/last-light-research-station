@@ -518,7 +518,7 @@ namespace LastLight.AI.Guard
 
         private void OnGUI()
         {
-            if (!showOverlay || LastDecision == null) return;
+            if (!(showOverlay || LastLight.Core.DebugOverlays.Guard) || LastDecision == null) return;
 
             StringBuilder text = new StringBuilder();
             text.AppendLine("<b>" + name + "</b>  Action: " + LastDecision.Action);

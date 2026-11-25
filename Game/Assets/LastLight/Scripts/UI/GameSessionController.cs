@@ -89,7 +89,24 @@ public sealed class GameSessionController : MonoBehaviour
             }
         }
 
+        HandleDebugOverlayKeys();
         UpdateHud();
+    }
+
+    // F1-F4 show each agent's decision overlay (Hunter, Guard, Repair, Director).
+    private void HandleDebugOverlayKeys()
+    {
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard == null ||
+            (State != SessionState.Playing && State != SessionState.Paused))
+        {
+            return;
+        }
+
+        if (keyboard.f1Key.wasPressedThisFrame) LastLight.Core.DebugOverlays.Hunter = !LastLight.Core.DebugOverlays.Hunter;
+        if (keyboard.f2Key.wasPressedThisFrame) LastLight.Core.DebugOverlays.Guard = !LastLight.Core.DebugOverlays.Guard;
+        if (keyboard.f3Key.wasPressedThisFrame) LastLight.Core.DebugOverlays.Repair = !LastLight.Core.DebugOverlays.Repair;
+        if (keyboard.f4Key.wasPressedThisFrame) LastLight.Core.DebugOverlays.Director = !LastLight.Core.DebugOverlays.Director;
     }
 
     public void StartGame()
@@ -195,7 +212,7 @@ public sealed class GameSessionController : MonoBehaviour
             case SessionState.Paused:
                 ConfigureOverlay(
                     "PAUSED",
-                    "Gameplay is frozen.",
+                    "Gameplay is frozen.\n\nAI analysis views:   F1 HUNTER   •   F2 GUARD   •   F3 REPAIR   •   F4 DIRECTOR",
                     "RESUME",
                     true);
                 break;
@@ -370,8 +387,11 @@ public sealed class GameSessionController : MonoBehaviour
         roomPanel.SetActive(!string.IsNullOrEmpty(room) && Time.unscaledTime < roomTitleUntil);
     }
 
+    private PlayerShooter shooterForPrompt;
+
     private string GetInteractionPrompt()
     {
+        if (shooterForPrompt == null) shooterForPrompt = FindFirstObjectByType<PlayerShooter>();
         if (grabber != null && grabber.IsHolding)
         {
             return "[E]  DROP OBJECT       [Q]  THROW";
@@ -418,7 +438,12 @@ public sealed class GameSessionController : MonoBehaviour
             return "[E]  INITIATE EVACUATION";
         StationWeaponPickup weapon = hit.collider.GetComponentInParent<StationWeaponPickup>();
         if (weapon != null)
-            return "[E]  TAKE " + weapon.Type.ToString().ToUpperInvariant();
+        {
+            string label = weapon.Type.ToString().ToUpperInvariant();
+            bool owned = shooterForPrompt != null &&
+                (weapon.Type == StationWeaponPickup.WeaponType.Rifle ? shooterForPrompt.HasRifle : shooterForPrompt.HasPistol);
+            return owned ? label + " ALREADY CARRIED" : "[E]  TAKE " + label;
+        }
         if (hit.collider.GetComponentInParent<StationMedkit>() != null)
             return "[E]  USE MEDKIT";
         if (hit.collider.GetComponentInParent<IInteractable>() != null)

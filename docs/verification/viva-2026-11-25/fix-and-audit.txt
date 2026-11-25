@@ -1,0 +1,36 @@
+
+==== Assets/LastLight/Scenes/ResearchStation.unity
+Fixed: 0 material slot(s) converted to URP, 0 collider(s) added
+  weapon pickups: Rifle @ Rifle on armory bench 0, Rifle @ Rifle on armory bench 1, Rifle @ Rifle on armory bench 2, Pistol @ Pistol on armory bench 0, Pistol @ Pistol on armory bench 1
+  relays: A, B
+  doors: 10 (None x8, BothRelays x1, RelayA x1)
+  medkits: 6, carryables: 5, evacuation terminals: 1
+  agents: Guard 1, Hunter 5, Repair 2, Director 1, Service 1
+PROBLEMS: 0
+
+==== Assets/LastLight/Scenes/PlayerTest.unity
+Fixed: 0 material slot(s) converted to URP, 0 collider(s) added
+  weapon pickups: 
+  relays: 
+  doors: 0 ()
+  medkits: 0, carryables: 1, evacuation terminals: 0
+  agents: Guard 0, Hunter 0, Repair 1, Director 0, Service 0
+PROBLEMS: 0
+
+==== Assets/LastLight/Scenes/AgentTest.unity
+Fixed: 0 material slot(s) converted to URP, 0 collider(s) added
+  weapon pickups: 
+  relays: 
+  doors: 0 ()
+  medkits: 0, carryables: 0, evacuation terminals: 0
+  agents: Guard 0, Hunter 4, Repair 0, Director 1, Service 0
+PROBLEMS: 0
+
+==== Assets/LastLight/Scenes/GuardTest.unity
+Fixed: 0 material slot(s) converted to URP, 0 collider(s) added
+  weapon pickups: 
+  relays: 
+  doors: 0 ()
+  medkits: 0, carryables: 0, evacuation terminals: 0
+  agents: Guard 1, Hunter 0, Repair 0, Director 0, Service 0
+PROBLEMS: 0

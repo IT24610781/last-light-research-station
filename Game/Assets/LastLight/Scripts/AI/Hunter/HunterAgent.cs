@@ -218,7 +218,7 @@ namespace LastLight.AI.Hunter
 
         private void OnGUI()
         {
-            if (!showOverlay || Brain == null) return;
+            if (!(showOverlay || LastLight.Core.DebugOverlays.Hunter) || Brain == null) return;
 
             var text = new System.Text.StringBuilder();
             text.AppendLine($"<b>{name}</b>  State: {Brain.State}");
@@ -238,7 +238,7 @@ namespace LastLight.AI.Hunter
             foreach (HunterAgent other in overlayOrder)
             {
                 if (other == this) break;
-                if (other.showOverlay && other.Brain != null)
+                if ((other.showOverlay || LastLight.Core.DebugOverlays.Hunter) && other.Brain != null)
                     top += 50f + 18f * other.Brain.LastScores.Count;
             }
             var area = new Rect(10, top, 520, 40 + 18 * Brain.LastScores.Count);

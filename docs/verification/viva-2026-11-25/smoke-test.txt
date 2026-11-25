@@ -1,0 +1,4 @@
+PASS AgentTest: 0 error(s) in 10 s of play
+PASS GuardTest: 0 error(s) in 10 s of play
+PASS PlayerTest: 0 error(s) in 10 s of play
+PASS ResearchStation: 0 error(s) in 10 s of play

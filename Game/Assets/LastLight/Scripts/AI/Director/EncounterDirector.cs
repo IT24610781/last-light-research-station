@@ -216,7 +216,7 @@ namespace LastLight.AI.Director
 
         private void OnGUI()
         {
-            if (!showOverlay || Brain == null) return;
+            if (!(showOverlay || LastLight.Core.DebugOverlays.Director) || Brain == null) return;
 
             var text = new System.Text.StringBuilder();
             text.AppendLine("<b>Encounter Director</b>");
@@ -232,7 +232,9 @@ namespace LastLight.AI.Director
             foreach (DirectorCandidate c in Brain.Candidates.Where(c => c.RejectedReason != null).Take(6))
                 text.AppendLine($"  {c.Label}: rejected ({c.RejectedReason})");
 
-            var area = new Rect(Screen.width - 470, 10, 460, 90 + 18 * Mathf.Min(12, Brain.Candidates.Count));
+            // Sit below the Guard panel when both are shown.
+            float top = LastLight.Core.DebugOverlays.Guard ? 270f : 10f;
+            var area = new Rect(Screen.width - 470, top, 460, 90 + 18 * Mathf.Min(12, Brain.Candidates.Count));
             GUI.Box(area, GUIContent.none);
             GUI.Box(area, GUIContent.none);
             var style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 13 };
