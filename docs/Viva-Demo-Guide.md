@@ -11,9 +11,12 @@ Open `Game` in Unity 6000.3.25f1 and open `Assets/LastLight/Scenes/ResearchStati
 | Q | Throw the held prop (makes an impact noise) |
 | Left mouse, R, 1, 2 | Fire, reload, rifle, pistol |
 | Esc | Pause (lists the analysis keys) |
+| M | Enlarge / shrink the station map (bottom right). It shows your floor, your position and facing, relay and exit state, and a red dot for any robot **while it is firing** |
 | **F1 / F2 / F3 / F4** | Show the decision panel for **Hunter / Guard / Repair / Director**. Off during normal play |
 | Last Light → Demo → Go To … | Play mode only: puts the player in front of a demo location (Armory, Relay A/B, Hunter, Guard, Repair Robot, Medical, crate, Evacuation) |
 | Last Light → Quality → … | Audit, gameplay check, smoke test, review screenshots |
+
+Every door has an illuminated name plate above it on the corridor side (amber = needs Relay A, red = needs both relays).
 
 Mission: Armory (take a gun) → Relay A in Power (opens the yellow door to the Main Lab) → upstairs → Relay B in Main Lab → red Evacuation door opens → walk into the evacuation bay or use the evacuation console. Either relay order works.
 
@@ -41,6 +44,10 @@ The station robots use the NavMesh adapter behind the same `IPathProvider` inter
 
 Repair utility (`RepairTargetSelector`): **U = 100 × missing-health fraction − 2 × route metres − 30 × observed danger**. Switch only if a challenger beats the current target by more than **15**. Team reports only within **25 m**; repair range **2 m**, **20 HP/s**, line of sight required, no self-repair, no resurrection; pause/death cancel repair. Evidence: Last Light → Run Repair Robot Verification (41/41).
 
+There are two Repair Robots: **Workshop** (upper floor, supports the Tactical Guard) and **Storage** (ground floor, supports the Sound Hunter). Shoot the Hunter in Storage and the Storage Repair Robot selects it and repairs it.
+
+HUD map (`Scripts/UI/StationMinimap.cs`, `StationMapLayout.cs`): it subscribes to the Guard's and Hunter's existing `AttackPerformed` events, so it never reads AI internals and never reveals robots that are not shooting.
+
 Code: `Scripts/Player`, `Scripts/Combat`, `Scripts/Interaction`, `Scripts/UI`, `Scripts/AI/Repair`, `Editor/Repair`.
 
 ## Member B — Agent Controller, Sound Hunter, Encounter Director
@@ -55,6 +62,10 @@ Hunter noise score: **0.5 × strength + 0.3 × recency − 0.2 × normalised rou
 Director limits: 5 active robots, 4 activations per run, 20 s cooldown, 10 m minimum distance, no bay in player view; waiting is always a candidate.
 
 Code: `Scripts/AI/Hunter`, `Scripts/AI/Director`, `Scripts/AI/Movement`; tests `Tests/Editor/HunterBrainTests.cs`, `DirectorBrainTests.cs`.
+
+## Service robot (supporting feature, not an assessed agent)
+
+The white drone in Crew Quarters / Main Lab is a neutral maintenance robot (`Scripts/AI/Service/ServiceRobotPatrol.cs`). It walks a loop of four service stations, faces each one and plays a 3-second "Deliver" animation, then moves on; a blocked stop is skipped. It never attacks. It has health and shuts down if shot, Repair Robots treat it as an ally, and the Director counts it toward the five-robot limit.
 
 ## Before the viva
 

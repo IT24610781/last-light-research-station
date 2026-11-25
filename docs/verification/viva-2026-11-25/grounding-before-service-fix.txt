@@ -1,0 +1,5 @@
+Security Tactical Guard: root y 5.080, lowest visible vertex 4.080, floor 4.000, gap +0.080 m
+Workshop Repair Robot: root y 4.650, lowest visible vertex 4.048, floor 4.000, gap +0.048 m
+Security Repair Robot: root y 4.650, lowest visible vertex 4.059, floor 4.000, gap +0.059 m
+Crew Quarters Service Robot: root y 4.080, lowest visible vertex 3.433, floor 4.000, gap -0.567 m
+Storage Sound Hunter: root y 1.080, lowest visible vertex 0.065, floor 0.000, gap +0.065 m

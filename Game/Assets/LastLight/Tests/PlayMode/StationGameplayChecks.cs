@@ -155,6 +155,29 @@ public sealed class StationGameplayChecks : MonoBehaviour
         return false;
     }
 
+    private static float LowestVisibleY(Transform root)
+    {
+        float minY = float.MaxValue;
+        foreach (var rend in root.GetComponentsInChildren<Renderer>().Where(x => x.enabled && (x is MeshRenderer || x is SkinnedMeshRenderer)))
+        {
+            if (rend is SkinnedMeshRenderer smr)
+            {
+                var mesh = new Mesh(); smr.BakeMesh(mesh, true);
+                foreach (var v in mesh.vertices) minY = Mathf.Min(minY, smr.transform.TransformPoint(v).y);
+                Destroy(mesh);
+            }
+            else minY = Mathf.Min(minY, rend.bounds.min.y);
+        }
+        return minY;
+    }
+
+    private static float FloorBelow(Transform root)
+    {
+        foreach (var hit in Physics.RaycastAll(root.position + Vector3.up * 0.5f, Vector3.down, 3f, ~0, QueryTriggerInteraction.Ignore).OrderBy(h => h.distance))
+            if (!hit.transform.IsChildOf(root)) return hit.point.y;
+        return float.NaN;
+    }
+
     private string Prompt()
     {
         MethodInfo method = typeof(GameSessionController).GetMethod("GetInteractionPrompt", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -369,7 +392,78 @@ public sealed class StationGameplayChecks : MonoBehaviour
             Check(stateBefore == LastLight.AI.Hunter.HunterState.Patrol, $"Sound Hunter is patrolling before the noise (no fake start-up noise): {stateBefore}");
             Check(heard, $"Sound Hunter hears the dropped crate and investigates its position ({hunter.Brain.State}; {hunter.Brain.Reason})");
         }
-        yield return new WaitForSecondsRealtime(4f);
+        yield return new WaitForSecondsRealtime(1f);
+
+        // ---- Round 2 features ----
+        Check(StationMapLayout.RoomAt(new Vector3(8f, 0.1f, 6f)) == "10  EVACUATION" && StationMapLayout.RoomAt(new Vector3(8f, 4.1f, 6f)) == "06  MAIN LAB / RELAY B"
+              && StationMapLayout.RoomAt(new Vector3(-8f, 0.1f, 8f)) == "05  STORAGE", "Room names match the built walls (HUD title and map)");
+
+        // Service robot stands on the floor (its model used to sink 0.57 m).
+        var service = FindFirstObjectByType<LastLight.AI.Service.ServiceRobotPatrol>();
+        if (service != null)
+        {
+            float gap = LowestVisibleY(service.transform) - FloorBelow(service.transform);
+            Check(gap > -0.03f && gap < 0.2f, $"Service robot body rests on the floor (gap {gap:+0.000;-0.000} m)");
+        }
+
+        // Larger barricade is still a movable physics object.
+        CarryableObject barricade = FindObjectsByType<CarryableObject>(FindObjectsSortMode.None).FirstOrDefault(c => c.name.Contains("Barricade"));
+        if (barricade != null)
+        {
+            var grab = player.GetComponent<PlayerGrabber>();
+            bool aimedBarricade = Aim(barricade.transform, out RaycastHit bh);
+            Check(barricade.transform.localScale.x > 1.2f && aimedBarricade, $"Enlarged barricade (scale {barricade.transform.localScale.x:0.00}) is targetable");
+            if (aimedBarricade)
+            {
+                grab.TryGrab(bh.collider.GetComponentInParent<CarryableObject>());
+                yield return new WaitForSecondsRealtime(0.3f);
+                Check(grab.IsHolding, "Player can pick up and move the enlarged barricade");
+                grab.Drop();
+                yield return new WaitForSecondsRealtime(0.5f);
+            }
+        }
+
+        // Ground-floor Repair Robot repairs the injured Sound Hunter.
+        var storageRepair = FindObjectsByType<RepairTargetSelector>(FindObjectsSortMode.None).FirstOrDefault(r => r.name.StartsWith("Storage"));
+        Check(storageRepair != null && storageRepair.transform.position.y < 2f, "A Repair Robot works on the ground floor (Storage)");
+        if (storageRepair != null && hunter != null)
+        {
+            hunter.SetPaused(true);
+            var hunterHealth = hunter.GetComponent<Health>();
+            var hunterAlly = hunter.GetComponent<RepairableAlly>();
+            hunterHealth.TakeDamage(40f);
+            float injured = hunterHealth.CurrentHealth;
+            float t = 0f;
+            while (t < 6f && storageRepair.CurrentTarget != hunterAlly) { t += Time.unscaledDeltaTime; yield return null; }
+            Check(storageRepair.CurrentTarget == hunterAlly, $"Storage Repair Robot selects the injured Hunter ({storageRepair.Decision})");
+            t = 0f;
+            while (t < 20f && hunterHealth.CurrentHealth <= injured) { t += Time.unscaledDeltaTime; yield return null; }
+            Check(hunterHealth.CurrentHealth > injured, $"Storage Repair Robot repairs the Hunter ({injured:0} -> {hunterHealth.CurrentHealth:0} HP)");
+            hunter.SetPaused(false);
+        }
+
+        // HUD map: player marker always; robot marker only while that robot is firing.
+        var map = FindFirstObjectByType<StationMinimap>();
+        Check(map != null, "In-game map is present");
+        var guardAgent = FindFirstObjectByType<LastLight.AI.Guard.TacticalGuardAgent>();
+        if (map != null && guardAgent != null)
+        {
+            yield return null;
+            Check(map.VisibleFiringMarkers == 0, "No robot marker on the map while no robot is firing");
+            guardAgent.SetPaused(false);
+            guardAgent.ResetAgentAt(new Vector3(0f, 4.2f, -2f), Quaternion.identity);
+            var pcc = player.GetComponent<CharacterController>();
+            pcc.enabled = false; player.transform.position = new Vector3(0f, 5.1f, 3f); pcc.enabled = true;
+            player.GetComponent<Health>().Heal(1000f);
+            float t = 0f;
+            while (t < 8f && map.VisibleFiringMarkers == 0) { t += Time.unscaledDeltaTime; yield return null; }
+            Check(map.VisibleFiringMarkers > 0, "Guard firing shows its marker on the map");
+            guardAgent.SetPaused(true);
+            pcc.enabled = false; player.transform.position = new Vector3(8f, 1.1f, -6f); pcc.enabled = true;
+            player.GetComponent<Health>().Heal(1000f);
+            yield return new WaitForSecondsRealtime(3.2f);
+            Check(map.VisibleFiringMarkers == 0, "Marker disappears after the robot stops firing");
+        }
         Check(session.State == GameSessionController.SessionState.Playing, "Station runs 6 s with every agent active and the player safe in Arrival");
 
         player.GetComponent<Health>().TakeDamage(1000f);

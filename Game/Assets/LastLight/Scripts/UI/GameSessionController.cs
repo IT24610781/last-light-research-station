@@ -365,19 +365,7 @@ public sealed class GameSessionController : MonoBehaviour
     {
         if (roomPanel == null || player == null) return;
         Vector3 position = player.transform.position;
-        string room = string.Empty;
-        if (Mathf.Abs(position.x) > 3.2f)
-        {
-            bool west = position.x < 0f;
-            bool upper = position.y > 3f;
-            int row = position.z < -4f ? 0 : position.z > 4f ? 2 : 1;
-            if (upper)
-                room = west ? new[] { "03  MEDICAL", "08  SECURITY", "07  ROBOT WORKSHOP" }[row]
-                            : new[] { "09  CREW QUARTERS", "06  MAIN LAB", "06  MAIN LAB" }[row];
-            else
-                room = west ? new[] { "02  ARMORY", "04  POWER ROOM", "05  STORAGE" }[row]
-                            : new[] { "01  ARRIVAL", "01  ARRIVAL", "10  EVACUATION" }[row];
-        }
+        string room = StationMapLayout.RoomAt(position);
         if (room != currentRoom)
         {
             currentRoom = room;
